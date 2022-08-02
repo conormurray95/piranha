@@ -28,3 +28,6 @@ jobs:
         working-directory: polyglot/piranha
       - run: cargo test
         working-directory: polyglot/piranha
+      - name: rust-tarpaulin
+        uses: actions-rs/tarpaulin@v0.1.0
+        working-directory: polyglot/piranha
