@@ -25,7 +25,7 @@ jwalk= "0.6.0"
 clap = { version = "3.1.12", features = ["derive"] }
 log = "0.4.16"
 env_logger = "0.9.0"
-tree-sitter-kotlin = { git = "https://github.com/ketkarameya/tree-sitter-kotlin.git" }
+tree-sitter-kotlin = "0.2.11"
 tree-sitter-java = { git = "https://github.com/tree-sitter/tree-sitter-java.git" }
-tree-sitter-swift = { git = "https://github.com/ketkarameya/tree-sitter-swift.git", branch = "add_parser" }
-tree-sitter-strings = { git = "https://github.com/ketkarameya/tree-sitter-strings.git" }
+tree-sitter-swift = "0.3.0"
+tree-sitter-strings = "0.1.0"
