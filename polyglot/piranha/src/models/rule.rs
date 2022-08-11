@@ -64,6 +64,10 @@ impl Rule {
     self.query.is_none() && self.replace.is_none()
   }
 
+  pub(crate) fn is_read_only_rule(&self) -> bool {
+    self.replace.is_none() && self.replace_node.is_none()
+  }
+
   /// Instantiate `self` with substitutions or panic.
   pub(crate) fn instantiate(&self, substitutions: &HashMap<String, String>) -> Rule {
     if let Ok(r) = self.try_instantiate(substitutions) {
