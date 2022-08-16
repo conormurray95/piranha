@@ -32,7 +32,7 @@ use clap::Parser;
 /// A refactoring tool that eliminates dead code related to stale feature flags.
 #[derive(Clone, Parser, Debug)]
 #[clap(name = "Piranha")]
-pub(crate) struct CommandLineArguments {
+pub struct CommandLineArguments {
   /// Path to source code folder
   #[clap(short = 'c', long)]
   pub(crate) path_to_codebase: String,

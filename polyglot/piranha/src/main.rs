@@ -14,21 +14,14 @@ Copyright (c) 2022 Uber Technologies, Inc.
 //! Defines the entry-point for Piranha.
 use std::{fs, time::Instant};
 
-use crate::{
+use piranha::{
   models::piranha_arguments::PiranhaArguments, piranha::execute_piranha,
+  models::piranha_output::PiranhaOutputSummary,
   utilities::initialize_logger,
 };
 use clap::StructOpt;
-use config::CommandLineArguments;
+use piranha::config::CommandLineArguments;
 use log::info;
-use models::piranha_output::PiranhaOutputSummary;
-
-mod config;
-mod models;
-mod piranha;
-#[cfg(test)]
-mod tests;
-mod utilities;
 
 fn main() {
   let now = Instant::now();

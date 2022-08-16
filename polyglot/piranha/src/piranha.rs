@@ -42,7 +42,7 @@ use tree_sitter::Node;
 
 /// Executes piranha for the given configuration
 /// Returns (List of updated piranha files, Map of matches found for each file, map of rewrites performed in each file)
-pub(crate) fn execute_piranha(configuration: &PiranhaArguments) -> (Vec<SourceCodeUnit>, Vec<PiranhaOutputSummary>) {
+pub fn execute_piranha(configuration: &PiranhaArguments) -> (Vec<SourceCodeUnit>, Vec<PiranhaOutputSummary>) {
   let mut flag_cleaner = FlagCleaner::new(configuration);
   flag_cleaner.perform_cleanup();
   // flag_cleaner.relevant_files
