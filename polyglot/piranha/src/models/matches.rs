@@ -13,26 +13,31 @@ Copyright (c) 2022 Uber Technologies, Inc.
 
 use std::collections::HashMap;
 
-use serde::{Serialize, Serializer};
-use tree_sitter::Range;
+use pyo3::prelude::*;
+use tree_sitter::{Point, Range};
 
 #[derive(serde_derive::Serialize, Debug, Clone)]
+#[pyclass]
 pub(crate) struct Match {
   // Range of the entire AST node captured by the match
-  #[serde(serialize_with = "ser_range")]
-  range: Range,
+  #[pyo3(get)]
+  range: LocalRange,
   // The mapping between tags and string representation of the AST captured.
+  #[pyo3(get)]
   matches: HashMap<String, String>,
 }
 
 impl Match {
   pub(crate) fn new(range: Range, matches: HashMap<String, String>) -> Self {
-    Self { range, matches }
+    Self {
+      range: LocalRange::new(range),
+      matches,
+    }
   }
 
   /// Get the edit's replacement range.
   pub(crate) fn range(&self) -> Range {
-    self.range
+    self.range.to_ts_range()
   }
 
   pub(crate) fn matches(&self) -> &HashMap<String, String> {
@@ -40,42 +45,62 @@ impl Match {
   }
 }
 
-/// This method serializes the `tree_sitter::Range` struct. Originally, it does not derive serde::Serialize
-/// So in this method, we cast `Range` to a local type `LocalRange` and serialize this casted object. 
-/// Note `LocalRange` derives serialize.
-fn ser_range<S: Serializer>(range: &Range, serializer: S) -> Result<S::Ok, S::Error> {
-  let local_range = LocalRange {
-    start_byte: range.start_byte,
-    end_byte: range.end_byte,
-    start_point: LocalPoint {
-      row: range.start_point.row,
-      column: range.start_point.column,
-    },
-    end_point: LocalPoint {
-      row: range.end_point.row,
-      column: range.end_point.column,
-    },
-  };
-
-  // Instead of serializing Vec<ExternalCrateColor>, we serialize Vec<LocalColor>.
-  local_range.serialize(serializer)
-}
-
-/// A range of positions in a multi-line text document, both in terms of bytes and of
-/// rows and columns.
-/// Note `LocalRange` derives serialize.
 #[derive(serde_derive::Serialize, Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[pyclass]
 struct LocalRange {
+  #[pyo3(get)]
   start_byte: usize,
+  #[pyo3(get)]
   end_byte: usize,
+  #[pyo3(get)]
   start_point: LocalPoint,
+  #[pyo3(get)]
   end_point: LocalPoint,
 }
 
+impl LocalRange {
+  fn new(range: Range) -> Self {
+    Self {
+      start_byte: range.start_byte,
+      end_byte: range.end_byte,
+      start_point: LocalPoint::new(range.start_point),
+      end_point: LocalPoint::new(range.end_point),
+    }
+  }
+
+  fn to_ts_range(&self) -> Range {
+    Range {
+      start_byte: self.start_byte,
+      end_byte: self.end_byte,
+      start_point: self.start_point.to_ts_point(),
+      end_point: self.end_point.to_ts_point(),
+    }
+  }
+}
+
 /// A range of positions in a multi-line text document, both in terms of bytes and of
 /// rows and columns.
 #[derive(serde_derive::Serialize, Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[pyclass]
 struct LocalPoint {
+  #[pyo3(get)]
   row: usize,
+  #[pyo3(get)]
   column: usize,
+}
+
+impl LocalPoint {
+  fn new(point: Point) -> Self {
+    Self {
+      row: point.row,
+      column: point.column,
+    }
+  }
+
+  fn to_ts_point(&self) -> Point {
+    Point {
+      row: self.row,
+      column: self.column,
+    }
+  }
 }

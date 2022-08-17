@@ -40,6 +40,7 @@ use crate::{
 use std::collections::VecDeque;
 use tree_sitter::Node;
 
+
 /// Executes piranha for the given configuration
 /// Returns (List of updated piranha files, Map of matches found for each file, map of rewrites performed in each file)
 pub fn execute_piranha(configuration: &PiranhaArguments) -> (Vec<SourceCodeUnit>, Vec<PiranhaOutputSummary>) {
@@ -48,6 +49,8 @@ pub fn execute_piranha(configuration: &PiranhaArguments) -> (Vec<SourceCodeUnit>
   // flag_cleaner.relevant_files
   (flag_cleaner.get_updated_files(), flag_cleaner.get_updated_files().iter().map(|f|PiranhaOutputSummary::new(f)).collect_vec())
 }
+
+
 
 impl SourceCodeUnit {
   /// Will apply the `rule` to all of its occurrences in the source code unit.
@@ -270,7 +273,7 @@ impl SourceCodeUnit {
 }
 
 // Maintains the state of Piranha and the updated content of files in the source code.
-struct FlagCleaner {
+pub struct FlagCleaner {
   // Maintains Piranha's state
   rule_store: RuleStore,
   // Path to source code folder
@@ -280,7 +283,7 @@ struct FlagCleaner {
 }
 
 impl FlagCleaner {
-  fn get_updated_files(&self) -> Vec<SourceCodeUnit> {
+  pub fn get_updated_files(&self) -> Vec<SourceCodeUnit> {
     self
       .relevant_files
       .values()
@@ -290,7 +293,7 @@ impl FlagCleaner {
   }
 
   /// Performs cleanup related to stale flags
-  fn perform_cleanup(&mut self) {
+  pub fn perform_cleanup(&mut self) {
     // Setup the parser for the specific language
     let mut parser = Parser::new();
     parser
@@ -371,7 +374,7 @@ impl FlagCleaner {
   }
 
   /// Instantiate Flag-cleaner
-  fn new(args: &PiranhaArguments) -> Self {
+  pub fn new(args: &PiranhaArguments) -> Self {
     let graph_rule_store = RuleStore::new(args);
     Self {
       rule_store: graph_rule_store,

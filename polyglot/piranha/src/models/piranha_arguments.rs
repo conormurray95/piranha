@@ -22,8 +22,12 @@ use crate::{
   models::piranha_config::PiranhaConfiguration,
   utilities::{read_toml, tree_sitter_utilities::TreeSitterHelpers},
 };
+use pyo3::prelude::*;
+
+
 
 #[derive(Clone)]
+#[pyclass]
 /// Captures the processed Piranha arguments (Piranha-Configuration) parsed from `path_to_feature_flag_rules`.
 pub struct PiranhaArguments {
   /// Path to source code folder.
@@ -48,6 +52,29 @@ pub struct PiranhaArguments {
 }
 
 impl PiranhaArguments {
+
+  pub fn new_1(lang: Vec<String>, path_to_code_base: String) {
+
+    let piranha_args_from_config = PiranhaConfiguration::new(lang);
+    let input_substitutions = piranha_args_from_config.substitutions();
+
+    Self {
+      path_to_code_base,
+      input_substitutions,
+      path_to_configurations: args.path_to_configurations,
+      path_to_output_summaries: args.path_to_output_summary,
+      language_name: String::from(&piranha_args_from_config.language()),
+      language: piranha_args_from_config.language().get_language(),
+      delete_file_if_empty: piranha_args_from_config
+        .delete_file_if_empty()
+        .unwrap_or(true),
+      delete_consecutive_new_lines: piranha_args_from_config
+        .delete_consecutive_new_lines()
+        .unwrap_or(false),
+    }
+
+  }
+
   pub fn new(args: CommandLineArguments) -> Self {
     let path_to_piranha_argument_file =
       PathBuf::from(args.path_to_configurations.as_str()).join("piranha_arguments.toml");

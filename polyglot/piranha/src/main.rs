@@ -14,13 +14,13 @@ Copyright (c) 2022 Uber Technologies, Inc.
 //! Defines the entry-point for Piranha.
 use std::{fs, time::Instant};
 
-use piranha::{
+use polyglot_piranha::{
   models::piranha_arguments::PiranhaArguments, piranha::execute_piranha,
   models::piranha_output::PiranhaOutputSummary,
   utilities::initialize_logger,
 };
 use clap::StructOpt;
-use piranha::config::CommandLineArguments;
+use polyglot_piranha::config::CommandLineArguments;
 use log::info;
 
 fn main() {

@@ -25,6 +25,18 @@ pub(crate) struct PiranhaConfiguration {
 }
 
 impl PiranhaConfiguration {
+  
+  pub(crate) fn new(
+    language: Vec<String>
+  ) -> Self {
+    Self {
+      language,
+      substitutions: Vec::new(),
+      delete_file_if_empty: None,
+      delete_consecutive_new_lines: None,
+    }
+  }
+
   pub(crate) fn substitutions(&self) -> HashMap<String, String> {
     self
       .substitutions
@@ -37,11 +49,11 @@ impl PiranhaConfiguration {
     self.language[0].clone()
   }
 
-    pub(crate) fn delete_file_if_empty(&self) -> Option<bool> {
-        self.delete_file_if_empty
-    }
+  pub(crate) fn delete_file_if_empty(&self) -> Option<bool> {
+    self.delete_file_if_empty
+  }
 
-    pub(crate) fn delete_consecutive_new_lines(&self) -> Option<bool> {
-        self.delete_consecutive_new_lines
-    }
+  pub(crate) fn delete_consecutive_new_lines(&self) -> Option<bool> {
+    self.delete_consecutive_new_lines
+  }
 }
