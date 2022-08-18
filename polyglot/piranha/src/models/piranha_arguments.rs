@@ -21,20 +21,20 @@ use tree_sitter::Language;
 use crate::{
   config::CommandLineArguments,
   models::piranha_config::PiranhaConfiguration,
-  utilities::{read_toml, tree_sitter_utilities::TreeSitterHelpers},
+  utilities::{read_toml, tree_sitter_utilities::{TreeSitterHelpers, self}},
 };
 
 #[derive(Clone)]
 /// Captures the processed Piranha arguments (Piranha-Configuration) parsed from `path_to_feature_flag_rules`.
 pub struct PiranhaArguments {
   /// Path to source code folder.
-  path_to_code_base: String,
+  // path_to_code_base: String,
   // Input arguments provided to Piranha, mapped to tag names -
   // @stale_flag_name, @namespace, @treated, @treated_complement
   // These substitutions instantiate the initial set of feature flag rules.
   input_substitutions: HashMap<String, String>,
   /// Folder containing the API specific rules
-  path_to_configurations: String,
+  // path_to_configurations: String,
   /// File to which the output summary should be written
   path_to_output_summaries: Option<String>,
   /// Tree-sitter language model
@@ -46,34 +46,56 @@ pub struct PiranhaArguments {
   // User option that determines whether consecutive newline characters will be
   // replaced with a newline character
   delete_consecutive_new_lines: bool,
-  // User option that determines the prefix used for tag names that should be considered 
+  // User option that determines the prefix used for tag names that should be considered
   /// global i.e. if a global tag is found when rewriting a source code unit
-  /// All source code units from this point will have access to this global tag. 
+  /// All source code units from this point will have access to this global tag.
   global_tag_prefix: Option<String>,
 }
 
+impl Default for  PiranhaArguments {
+  fn default() -> Self {
+    Self {
+      input_substitutions : HashMap::new(),
+      path_to_output_summaries: None,
+      language : String::from("java").get_language(),
+      language_name:String::from("java"),
+      delete_file_if_empty : true,
+      delete_consecutive_new_lines: false,
+      global_tag_prefix: None,
+    }
+  }
+}
+
 impl PiranhaArguments {
-  pub fn from_command_line() -> Self {
-    Self::new(CommandLineArguments::parse())
+  pub fn from_substitutions_language(
+    input_substitutions: HashMap<String, String>, language_name: String,
+  ) -> Self {
+    Self {
+      input_substitutions,
+      language: language_name.get_language(),
+      language_name,
+      ..Default::default()
+    }
   }
 
-  pub(crate) fn new(args: CommandLineArguments) -> Self {
+  pub fn from_command_line(command_line_args: &CommandLineArguments) -> Self {
+    Self::new1(command_line_args)
+  }
+  pub(crate) fn new1(args: &CommandLineArguments) -> Self {
     let path_to_piranha_argument_file =
-      PathBuf::from(args.path_to_configurations.as_str()).join("piranha_arguments.toml");
+      PathBuf::from(args.path_to_configurations()).join("piranha_arguments.toml");
 
-    let piranha_args_from_config: PiranhaConfiguration =
-      read_toml(&path_to_piranha_argument_file, false);
-
+    let piranha_args_from_config  = PiranhaConfiguration::read_from(&path_to_piranha_argument_file) ;
+      
     let input_substitutions = piranha_args_from_config.substitutions();
 
     #[rustfmt::skip]
       info!("{}",  format!("Piranha arguments are :\n {:?}", input_substitutions).purple());
 
     Self {
-      path_to_code_base: args.path_to_codebase.to_string(),
       input_substitutions,
-      path_to_configurations: args.path_to_configurations,
-      path_to_output_summaries: args.path_to_output_summary,
+      // path_to_configurations: args.path_to_configurations,
+      path_to_output_summaries: args.path_to_output_summary(),
       language_name: String::from(&piranha_args_from_config.language()),
       language: piranha_args_from_config.language().get_language(),
       delete_file_if_empty: piranha_args_from_config
@@ -86,17 +108,17 @@ impl PiranhaArguments {
     }
   }
 
-  pub(crate) fn path_to_code_base(&self) -> &str {
-    self.path_to_code_base.as_ref()
-  }
+  // pub(crate) fn path_to_code_base(&self) -> &str {
+  //   self.path_to_code_base.as_ref()
+  // }
 
   pub(crate) fn input_substitutions(&self) -> &HashMap<String, String> {
     &self.input_substitutions
   }
 
-  pub(crate) fn path_to_configurations(&self) -> &str {
-    self.path_to_configurations.as_ref()
-  }
+  // pub(crate) fn path_to_configurations(&self) -> &str {
+  //   self.path_to_configurations.as_ref()
+  // }
 
   pub(crate) fn language(&self) -> Language {
     self.language
@@ -115,14 +137,14 @@ impl PiranhaArguments {
   }
 
   pub fn path_to_output_summaries(&self) -> Option<&String> {
-        self.path_to_output_summaries.as_ref()
-    }
-  
+    self.path_to_output_summaries.as_ref()
+  }
+
   /// Returns default Global prefix tag as "GLOBAL_TAG."
-  /// i.e. it expects global tag names to lok like 
+  /// i.e. it expects global tag names to lok like
   /// @GLOBAL_TAG.class_name
   pub(crate) fn global_tag_prefix(&self) -> &str {
-    if let Some(t) = &self.global_tag_prefix{
+    if let Some(t) = &self.global_tag_prefix {
       return t.as_str();
     }
     "GLOBAL_TAG."
@@ -142,15 +164,14 @@ impl PiranhaArguments {
   pub(crate) fn dummy() -> Self {
     let language_name = String::from("java");
     PiranhaArguments {
-      path_to_code_base: String::new(),
       input_substitutions: HashMap::new(),
-      path_to_configurations: String::new(),
+      // path_to_configurations: String::new(),
       path_to_output_summaries: None,
       language: language_name.get_language(),
       language_name,
       delete_consecutive_new_lines: false,
       delete_file_if_empty: false,
-      global_tag_prefix: None
+      global_tag_prefix: None,
     }
   }
 
@@ -159,15 +180,15 @@ impl PiranhaArguments {
   ) -> Self {
     let language_name = String::from("java");
     let mut args = PiranhaArguments {
-      path_to_code_base: String::new(),
+      // path_to_code_base: String::new(),
       input_substitutions: HashMap::new(),
-      path_to_configurations: String::new(),
+      // path_to_configurations: String::new(),
       path_to_output_summaries: None,
       language: language_name.get_language(),
       language_name,
       delete_consecutive_new_lines: false,
       delete_file_if_empty: false,
-      global_tag_prefix: None
+      global_tag_prefix: None,
     };
     args.set_delete_consecutive_new_lines(delete_consecutive_new_lines);
     args.set_delete_file_if_empty(delete_file_if_empty);

@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, path::PathBuf};
 
 /*
 Copyright (c) 2022 Uber Technologies, Inc.
@@ -13,16 +13,19 @@ Copyright (c) 2022 Uber Technologies, Inc.
  limitations under the License.
 */
 
+use itertools::Itertools;
 use serde_derive::Deserialize;
+
+use crate::utilities::read_toml;
 
 /// Captures the Piranha arguments by from the file at `path_to_feature_flag_rules`.
 #[derive(Deserialize, Debug, Clone, Hash, PartialEq, Eq, Default)]
-pub(crate) struct PiranhaConfiguration {
-  language: Vec<String>,
-  substitutions: Vec<Vec<String>>,
-  delete_file_if_empty: Option<bool>,
-  delete_consecutive_new_lines: Option<bool>,
-  global_tag_prefix: Option<String>,
+pub struct PiranhaConfiguration {
+  pub(crate)language: Vec<String>,
+  pub(crate) substitutions: Vec<Vec<String>>,
+  pub(crate) delete_file_if_empty: Option<bool>,
+  pub(crate) delete_consecutive_new_lines: Option<bool>,
+  pub(crate) global_tag_prefix: Option<String>
 }
 
 impl PiranhaConfiguration {
@@ -34,19 +37,39 @@ impl PiranhaConfiguration {
       .collect()
   }
 
+  pub fn read_from(path_to_piranha_argument_file: &PathBuf) -> Self {
+    read_toml(path_to_piranha_argument_file, false)
+  }
+
   pub(crate) fn language(&self) -> String {
     self.language[0].clone()
   }
 
-  pub(crate) fn delete_file_if_empty(&self) -> Option<bool> {
-    self.delete_file_if_empty
+  pub(crate) fn delete_file_if_empty(&self) -> bool {
+    if let Some(s) = self.delete_file_if_empty {
+      return s;
+    }
+    return true;
   }
 
-    pub(crate) fn delete_consecutive_new_lines(&self) -> Option<bool> {
-        self.delete_consecutive_new_lines
+  pub(crate) fn delete_consecutive_new_lines(&self) -> bool {
+    if let Some(s) = self.delete_consecutive_new_lines {
+      return s;
     }
+    return false;
+  }
 
-  pub(crate) fn global_tag_prefix(&self) -> Option<String> {
-      self.global_tag_prefix.clone()
+  pub(crate) fn global_tag_prefix(&self) -> &str {
+    if let Some(t) = &self.global_tag_prefix {
+      return t.as_str();
+    }
+    "GLOBAL_TAG."
+  }
+
+  pub fn set_substitutions(&mut self, substitutions: &HashMap<String, String>) {
+    self.substitutions = substitutions
+      .iter()
+      .map(|(k, v)| vec![k.to_string(), v.to_string()])
+      .collect_vec();
   }
 }

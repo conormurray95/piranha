@@ -12,26 +12,41 @@ Copyright (c) 2022 Uber Technologies, Inc.
 */
 
 //! Defines the entry-point for Piranha.
-use std::{fs, time::Instant};
+use std::{fs, time::Instant, path::PathBuf};
 
+use clap::Parser;
 use log::info;
 use polyglot_piranha::{
-  execute_piranha, models::piranha_arguments::PiranhaArguments,
-  models::piranha_output::PiranhaOutputSummary, utilities::initialize_logger,
+  config::CommandLineArguments, execute_piranha,
+  models::{piranha_output::PiranhaOutputSummary, piranha_config::PiranhaConfiguration}, read_user_rules_and_configurations, utilities::initialize_logger,
 };
 
 fn main() {
   let now = Instant::now();
   initialize_logger(false);
 
-  let args = PiranhaArguments::from_command_line();
+  let command_line_args = CommandLineArguments::parse();
 
-  let piranha_output_summaries = execute_piranha(&args, true);
+  // let path_to_test_ff = cm\;
+  let path_to_configurations = PathBuf::from(command_line_args.path_to_configurations());
 
-  if args.path_to_output_summaries().is_some() {
+  let (rules, edges, _) = read_user_rules_and_configurations(&path_to_configurations);
+
+  let args = PiranhaConfiguration::read_from(&path_to_configurations);
+
+
+  let piranha_output_summaries = execute_piranha(
+    &args,
+    true,
+    rules,
+    edges,
+    command_line_args.path_to_codebase().to_string(),
+  );
+
+  if command_line_args.path_to_output_summary().is_some() {
     write_output_summary(
       piranha_output_summaries,
-      args.path_to_output_summaries().unwrap(),
+      &command_line_args.path_to_output_summary().unwrap(),
     );
   }
 

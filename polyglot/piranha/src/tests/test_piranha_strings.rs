@@ -13,16 +13,16 @@ Copyright (c) 2022 Uber Technologies, Inc.
 
 use super::{initialize, run_rewrite_test};
 
-static LANGUAGE: &str = "strings";
+static LANGUAGE: &str  = "strings";
 
 #[test]
 fn test_strings_scenario_rules_with_holes() {
   initialize();
-  run_rewrite_test(&format!("{}/{}", LANGUAGE, "rules_with_holes"), 2);
+  run_rewrite_test(&format!("{}/{}", LANGUAGE, "rules_with_holes"), 2,LANGUAGE);
 }
 
 #[test]
 fn test_strings_scenario_rules_with_no_holes() {
   initialize();
-  run_rewrite_test(&format!("{}/{}", LANGUAGE, "rules_with_no_holes"), 2);
+  run_rewrite_test(&format!("{}/{}", LANGUAGE, "rules_with_no_holes"), 2, LANGUAGE);
 }

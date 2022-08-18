@@ -11,22 +11,23 @@ Copyright (c) 2022 Uber Technologies, Inc.
  limitations under the License.
 */
 
-use std::collections::HashMap;
+use std::{collections::HashMap, path::Path};
 
 use colored::Colorize;
 use log::info;
 use tree_sitter::{Language, Query};
 
 use crate::{
-  config::read_config_files,
-  models::piranha_arguments::PiranhaArguments,
+  config::get_pre_built_rules,
   models::{
     rule::Rule,
     rule_graph::RuleGraph,
     scopes::{ScopeGenerator, ScopeQueryGenerator},
   },
-  utilities::{tree_sitter_utilities::TreeSitterHelpers, MapOfVec},
+  utilities::{read_toml, tree_sitter_utilities::TreeSitterHelpers, MapOfVec},
 };
+
+use super::{outgoing_edges::Edges, rule::Rules, piranha_config::PiranhaConfiguration};
 
 pub(crate) static GLOBAL: &str = "Global";
 pub(crate) static PARENT: &str = "Parent";
@@ -43,14 +44,33 @@ pub(crate) struct RuleStore {
   // Scope generators.
   scopes: Vec<ScopeGenerator>,
   // Command line arguments passed to piranha
-  piranha_args: PiranhaArguments,
+  piranha_args: PiranhaConfiguration,
   // Command line arguments passed to piranha
   global_tags: HashMap<String, String>,
 }
 
 impl RuleStore {
-  pub(crate) fn new(args: &PiranhaArguments) -> RuleStore {
-    let (rules, edges, scopes) = read_config_files(args);
+  pub(crate) fn new(args: &PiranhaConfiguration, input_rules: Rules, input_edges: Edges) -> RuleStore {
+    let language_name = args.language();
+    // let path_to_configurations = args.path_to_configurations();
+    
+    let (language_rules, language_edges, scopes) = get_pre_built_rules(language_name);
+    
+    // let (mut input_rules, input_edges) = read_user_rules(path_to_config);
+    // let path_to_config = Path::new(path_to_configurations);
+
+    // let mut input_rules: Rules = read_toml(&path_to_config.join("rules.toml"), true);
+    // let input_edges: Edges = read_toml(&path_to_config.join("edges.toml"), true);
+    // for r in input_rules.rules.iter_mut() {
+    //   r.add_to_feature_flag_api_group();
+    // }
+
+    return Self::from(language_rules, input_rules, language_edges, input_edges, scopes, args);
+  }
+
+  fn from(language_rules: Rules, input_rules: Rules, language_edges: Edges, input_edges: Edges, scopes: Vec<ScopeGenerator>, args: &PiranhaConfiguration) -> Self {
+    let rules = [language_rules.rules, input_rules.rules.clone()].concat();
+    let edges = [language_edges.edges, input_edges.edges].concat();
     let rule_graph = RuleGraph::new(&edges, &rules);
     let mut rule_store = RuleStore {
       rule_graph,
@@ -61,11 +81,9 @@ impl RuleStore {
       piranha_args: args.clone(),
       global_tags: HashMap::new(),
     };
-
-    for (_, rule) in rule_store.rules_by_name.clone() {
-      if rule.is_feature_flag_cleanup() {
-        rule_store.add_to_global_rules(&rule, args.input_substitutions());
-      }
+    let rules_by_name = rule_store.rules_by_name.clone();
+    for r in input_rules.rules.iter() {
+      rule_store.add_to_global_rules(&rules_by_name[&r.name()], &args.substitutions());
     }
     rule_store
   }
@@ -75,15 +93,15 @@ impl RuleStore {
   }
 
   pub(crate) fn language(&self) -> Language {
+    self.language_name().get_language()
+  }
+
+  pub(crate) fn language_name(&self) -> String {
     self.piranha_args.language()
   }
 
-  pub(crate) fn language_name(&self) -> &str {
-    self.piranha_args.language_name()
-  }
-
   pub(crate) fn default_substitutions(&self) -> HashMap<String, String> {
-    let mut default_subs = self.piranha_args.input_substitutions().clone();
+    let mut default_subs = self.piranha_args.substitutions().clone();
     default_subs.extend(self.global_tags().clone());
     default_subs
   }
@@ -173,6 +191,8 @@ impl RuleStore {
   }
 }
 
+
+
 #[cfg(test)]
 impl RuleStore {
   pub(crate) fn dummy() -> RuleStore {
@@ -181,7 +201,7 @@ impl RuleStore {
       rule_query_cache: HashMap::new(),
       rules_by_name: HashMap::new(),
       global_rules: vec![],
-      piranha_args: PiranhaArguments::dummy(),
+      piranha_args: PiranhaConfiguration::default(),
       scopes: vec![],
       global_tags: HashMap::new(),
     }
@@ -193,9 +213,9 @@ impl RuleStore {
       rule_query_cache: HashMap::new(),
       rules_by_name: HashMap::new(),
       global_rules: vec![],
-      piranha_args: PiranhaArguments::dummy(),
+      piranha_args: PiranhaConfiguration::default(),
       scopes,
-      global_tags : HashMap::new()
+      global_tags: HashMap::new(),
     }
   }
 }

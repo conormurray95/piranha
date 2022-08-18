@@ -12,17 +12,18 @@ Copyright (c) 2022 Uber Technologies, Inc.
 */
 
 use models::{
-  piranha_arguments::PiranhaArguments, piranha_output::PiranhaOutputSummary,
-  source_code_unit::SourceCodeUnit,
+  piranha_output::PiranhaOutputSummary,
+  source_code_unit::SourceCodeUnit, rule::Rules, outgoing_edges::Edges, piranha_config::PiranhaConfiguration,
 };
+use utilities::read_toml;
 
-mod config;
+pub mod config;
 pub mod models;
 #[cfg(test)]
 mod tests;
 pub mod utilities;
 
-use std::{collections::HashMap, path::PathBuf};
+use std::{collections::HashMap, path::{PathBuf}};
 
 use colored::Colorize;
 use itertools::Itertools;
@@ -52,9 +53,9 @@ use tree_sitter::Node;
 /// Executes piranha for the given configuration
 /// Returns (List of updated piranha files, Map of matches found for each file, map of rewrites performed in each file)
 pub fn execute_piranha(
-  configuration: &PiranhaArguments, should_rewrite_files: bool,
+  configuration: &PiranhaConfiguration, should_rewrite_files: bool, rules: Rules, edges: Edges, path_to_codebase: String
 ) -> Vec<PiranhaOutputSummary> {
-  let mut flag_cleaner = FlagCleaner::new(configuration);
+  let mut flag_cleaner = FlagCleaner::new(configuration, rules, edges, path_to_codebase);
   flag_cleaner.perform_cleanup();
 
   let source_code_units = flag_cleaner.get_updated_files();
@@ -71,6 +72,17 @@ pub fn execute_piranha(
     .iter()
     .map(PiranhaOutputSummary::new)
     .collect_vec()
+}
+
+
+pub fn read_user_rules_and_configurations(path_to_config: &PathBuf) -> (Rules, Edges, PiranhaConfiguration) {
+  let mut input_rules: Rules = read_toml(&path_to_config.join("rules.toml"), true);
+  let input_edges: Edges = read_toml(&path_to_config.join("edges.toml"), true);
+  let piranha_config = PiranhaConfiguration::read_from(&path_to_config.join("piranha_arguments.toml"));
+  for r in input_rules.rules.iter_mut() {
+    r.add_to_feature_flag_api_group();
+  }
+  (input_rules, input_edges, piranha_config)
 }
 
 impl SourceCodeUnit {
@@ -395,11 +407,11 @@ impl FlagCleaner {
   }
 
   /// Instantiate Flag-cleaner
-  fn new(args: &PiranhaArguments) -> Self {
-    let graph_rule_store = RuleStore::new(args);
+  fn new(args: &PiranhaConfiguration, rules: Rules, edges: Edges, path_to_codebase: String) -> Self {
+    let graph_rule_store = RuleStore::new(args, rules, edges);
     Self {
       rule_store: graph_rule_store,
-      path_to_codebase: String::from(args.path_to_code_base()),
+      path_to_codebase,
       relevant_files: HashMap::new(),
     }
   }

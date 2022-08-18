@@ -8,7 +8,7 @@ use tempdir::TempDir;
 
 use tree_sitter::Parser;
 
-use crate::models::piranha_arguments::PiranhaArguments;
+use crate::models::piranha_config::PiranhaConfiguration;
 use {
   super::SourceCodeUnit,
   crate::{
@@ -151,7 +151,7 @@ fn test_apply_edit_comma_handling_via_regex() {
   ));
 }
 fn execute_persist_in_temp_folder(
-  source_code: &str, args: &PiranhaArguments,
+  source_code: &str, args: &PiranhaConfiguration,
   check_predicate: &dyn Fn(&TempDir) -> Result<bool, io::Error>,
 ) -> Result<bool, io::Error> {
   let mut parser = get_parser(String::from("java"));
@@ -170,7 +170,7 @@ fn execute_persist_in_temp_folder(
 
 #[test]
 fn test_persist_delete_file_when_empty() -> Result<(), io::Error> {
-  let args = PiranhaArguments::dummy_with_user_opt(true, true);
+  let args = PiranhaConfiguration::default();
   let source_code = "";
   fn check(temp_dir: &TempDir) -> Result<bool, io::Error> {
     let paths = fs::read_dir(temp_dir)?;
@@ -182,7 +182,10 @@ fn test_persist_delete_file_when_empty() -> Result<(), io::Error> {
 
 #[test]
 fn test_persist_do_not_delete_file_when_empty() -> Result<(), io::Error> {
-  let args = PiranhaArguments::dummy_with_user_opt(false, true);
+  let args =  PiranhaConfiguration {  
+    delete_file_if_empty: Some(false),
+    ..Default::default()
+};
   let source_code = "";
   fn check(temp_dir: &TempDir) -> Result<bool, io::Error> {
     let paths = fs::read_dir(temp_dir)?;
@@ -195,7 +198,10 @@ fn test_persist_do_not_delete_file_when_empty() -> Result<(), io::Error> {
 
 #[test]
 fn test_persist_delete_consecutive_lines() -> Result<(), io::Error> {
-  let args = PiranhaArguments::dummy_with_user_opt(true, true);
+  let args =  PiranhaConfiguration {  
+    delete_consecutive_new_lines: Some(true),
+    ..Default::default()
+};
   let source_code_test_1 = "class Test {
     public void foobar() {
 
@@ -245,7 +251,7 @@ fn test_persist_delete_consecutive_lines() -> Result<(), io::Error> {
 
 #[test]
 fn test_persist_do_not_delete_consecutive_lines() -> Result<(), io::Error> {
-  let args = PiranhaArguments::dummy_with_user_opt(true, false);
+  let args = PiranhaConfiguration::default();
   let source_code = "class Test {
     public void foobar() {
 

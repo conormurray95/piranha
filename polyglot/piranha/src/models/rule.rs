@@ -31,12 +31,12 @@ static FEATURE_FLAG_API_GROUP: &str = "Feature-flag API cleanup";
 
 #[derive(Deserialize, Debug, Clone, Hash, Default)]
 // Represents the `rules.toml` file
-pub(crate) struct Rules {
-  pub(crate) rules: Vec<Rule>,
+pub struct Rules {
+  pub rules: Vec<Rule>,
 }
 
 #[derive(Deserialize, Debug, Clone, Hash, Default)]
-pub(crate) struct Rule {
+pub struct Rule {
   /// Name of the rule. (It is unique)
   name: String,
   /// Tree-sitter query as string

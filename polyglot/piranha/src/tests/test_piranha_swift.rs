@@ -21,7 +21,7 @@ static LANGUAGE: &str = "swift";
 #[test]
 fn test_cascading_delete_file() {
   initialize();
-  run_rewrite_test(&format!("{}/{}",LANGUAGE, "cascade_file_delete"), 3);
+  run_rewrite_test(&format!("{}/{}",LANGUAGE, "cascade_file_delete"), 3, LANGUAGE);
 }
 
 
@@ -31,5 +31,5 @@ fn test_cascading_delete_file() {
 #[test]
 fn test_cascading_delete_file_custom_global_tag() {
   initialize();
-  run_rewrite_test(&format!("{}/{}",LANGUAGE, "cascade_file_delete_custom_global_tag"), 3);
+  run_rewrite_test(&format!("{}/{}",LANGUAGE, "cascade_file_delete_custom_global_tag"), 3, LANGUAGE);
 }
