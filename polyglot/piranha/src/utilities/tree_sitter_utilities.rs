@@ -285,14 +285,14 @@ pub(crate) fn get_tree_sitter_edit(
 // Finds the position (col and row number) for a given offset.
 fn position_for_offset(input: &[u8], offset: usize) -> Point {
   let mut result = Point { row: 0, column: 0 };
-  for c in &input[0..offset] {
-    if *c as char == '\n' {
-      result.row += 1;
-      result.column = 0;
-    } else {
-      result.column += 1;
-    }
-  }
+  // for c in &input[0..offset] {
+  //   if *c as char == '\n' {
+  //     result.row += 1;
+  //     result.column = 0;
+  //   } else {
+  //     result.column += 1;
+  //   }
+  // }
   result
 }
 
@@ -313,14 +313,15 @@ fn _get_tree_sitter_edit(
   }
 }
 
-pub(crate) fn substitute_tags(s: String, substitutions: &HashMap<String, String>) -> String {
+pub(crate) fn substitute_tags(s: String, substitutions: &HashMap<String, String>, is_tree_sitter_query: bool) -> String {
   let mut output = s;
   for (tag, substitute) in substitutions {
     // Before replacing the key, it is transformed to a tree-sitter tag by adding `@` as prefix
     let key = format!("@{}", tag);
-    output = output.replace(&key, &substitute.replace('\n', "\\n"))
+    let substitution_value = if is_tree_sitter_query { substitute.replace('\n', "\\n").to_string() } else { substitute.to_string()};
+    output = output.replace(&key, &substitution_value);
   }
-  output
+  if !is_tree_sitter_query { output.replace("\\n", "\n").to_string() } else { output.to_string()}
 }
 
 /// Get the smallest node within `self` that spans the given range.

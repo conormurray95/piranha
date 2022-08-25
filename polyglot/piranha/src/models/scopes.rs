@@ -59,6 +59,10 @@ impl ScopeGenerator {
     let root_node = source_code_unit.root_node();
     let mut changed_node = get_node_for_range(root_node, start_byte, end_byte);
 
+    if changed_node.child_count() > 0 {
+      changed_node = changed_node.child(0).unwrap();
+    }
+
     // Get the scope matchers for `scope_level` from the `scope_config.toml`.
     let scope_matchers = rules_store.get_scope_query_generators(scope_level);
 
@@ -72,7 +76,7 @@ impl ScopeGenerator {
         ) {
           // Generate the scope query for the specific context by substituting the
           // the tags with code snippets appropriately in the `generator` query.
-          return substitute_tags(m.generator(), p_match.matches());
+          return substitute_tags(m.generator(), p_match.matches(), true);
         } else {
           changed_node = parent;
         }
