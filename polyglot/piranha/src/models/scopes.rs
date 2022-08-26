@@ -58,7 +58,9 @@ impl ScopeGenerator {
   ) -> String {
     let root_node = source_code_unit.root_node();
     let mut changed_node = get_node_for_range(root_node, start_byte, end_byte);
-
+    println!("{} {}", start_byte, end_byte);
+    println!("{}",& source_code_unit.code()[start_byte..end_byte]);
+    println!("{:?}", changed_node.utf8_text(source_code_unit.code().as_bytes()));
     if changed_node.child_count() > 0 {
       changed_node = changed_node.child(0).unwrap();
     }
@@ -68,6 +70,7 @@ impl ScopeGenerator {
 
     // Match the `scope_matcher.matcher` to the parent
     while let Some(parent) = changed_node.parent() {
+      println!("{:?}", changed_node.utf8_text(source_code_unit.code().as_bytes()));
       for m in &scope_matchers {
         if let Some(p_match) = parent.get_match_for_query(
           &source_code_unit.code(),

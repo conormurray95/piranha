@@ -180,7 +180,7 @@ impl SourceCodeUnit {
     rules_store: &mut RuleStore, parser: &mut Parser,
   ) {
     let (mut current_match_range, mut current_replace_range) = (match_range, replace_range);
-
+    println!("{:?}", rule.name());
     let mut current_rule = rule.name();
     let mut next_rules_stack: VecDeque<(String, Rule)> = VecDeque::new();
     // Perform the parent edits, while queueing the Method and Class level edits.
@@ -192,7 +192,7 @@ impl SourceCodeUnit {
       // Adds "Method" and "Class" rules to the stack
       self.add_rules_to_stack(
         &next_rules_by_scope,
-        current_match_range,
+        current_replace_range,
         rules_store,
         &mut next_rules_stack,
       );
@@ -247,6 +247,7 @@ impl SourceCodeUnit {
       // Scope level is not "PArent" or "Global"
       if ![PARENT, GLOBAL].contains(&scope_level.as_str()) {
         for rule in rules {
+          println!("{}", rule.name());
           let scope_query = ScopeGenerator::get_scope_query(
             self.clone(),
             scope_level,
@@ -325,7 +326,7 @@ impl FlagCleaner {
     loop {
       let current_rules = self.rule_store.global_rules();
 
-      info!("{}", format!("# Global rules {}", current_rules.len()));
+      println!("{}", format!("# Global rules {}", current_rules.len()));
       // Iterate over each file containing the usage of the feature flag API
       for (path, content) in self.get_files_containing_feature_flag_api_usage() {
         self
@@ -347,7 +348,7 @@ impl FlagCleaner {
 
         // Break when a new `global` rule is added
         if self.rule_store.global_rules().len() > current_rules.len() {
-          info!("Found a new global rule. Will start scanning all the files again.");
+          println!("Found a new global rule. Will start scanning all the files again.");
           break;
         }
       }
@@ -390,7 +391,7 @@ impl FlagCleaner {
       .filter(|x| no_global_rules_with_holes || pattern.is_match(x.1.as_str()))
       .collect();
     #[rustfmt::skip]
-    println!("{}", format!("Will parse and analyze {} files.", files.len()).green());
+    println!("{}", format!("Will parse and analyze {} files. {} {}", files.len(), pattern, no_global_rules_with_holes).green());
     files
   }
 
@@ -413,6 +414,7 @@ impl FlagCleaner {
   /// This heuristic reduces the number of files to parse.
   ///
   fn get_grep_heuristics(&self) -> Regex {
+    println!("{:?}", &self.rule_store.global_rules().len());
     let reg_x = self
       .rule_store
       .global_rules()

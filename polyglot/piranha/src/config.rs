@@ -74,7 +74,7 @@ pub(crate) fn read_config_files(
   for r in input_rules.rules.iter_mut() {
     r.add_to_seed_rules_group();
   }
-
+  println!("{} {}", input_rules.rules.len(), input_edges.edges.len() );
   let all_rules = [language_rules.rules, input_rules.rules].concat();
   let all_edges = [language_edges.edges, input_edges.edges].concat();
 

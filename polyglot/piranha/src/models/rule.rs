@@ -135,6 +135,8 @@ impl Rule {
     let mut gh = HashSet::new();
     for hole in self.holes() {
       if let Some(x) = substitutions.get(&hole) {
+
+        println!("Substitute added: {} {}", x, &hole);
         gh.insert(x.clone());
       }
     }

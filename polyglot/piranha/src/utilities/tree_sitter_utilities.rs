@@ -266,7 +266,7 @@ pub(crate) fn get_tree_sitter_edit(
     replacement_snippet_fmt.push_str(&format!("\n to \n{}", replacement.italic()))
   }
   #[rustfmt::skip]
-  info!("\n {} at ({:?}) -\n {}", edit_kind , &replace_range, replacement_snippet_fmt);
+  println!("\n {} at ({:?}) -\n {}", edit_kind , &replace_range, replacement_snippet_fmt);
 
   (
     // Create the new source code content by appropriately
@@ -321,7 +321,8 @@ pub(crate) fn substitute_tags(s: String, substitutions: &HashMap<String, String>
     let substitution_value = if is_tree_sitter_query { substitute.replace('\n', "\\n").to_string() } else { substitute.to_string()};
     output = output.replace(&key, &substitution_value);
   }
-  if !is_tree_sitter_query { output.replace("\\n", "\n").to_string() } else { output.to_string()}
+  output
+  //if !is_tree_sitter_query { output.replace("\\n", "\n").to_string() } else { output.to_string()}
 }
 
 /// Get the smallest node within `self` that spans the given range.
