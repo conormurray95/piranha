@@ -2,7 +2,7 @@
 authors = ["Ameya Ketkar <ketkara@uber.com>", "Lazaro Clapp <lazaro@uber.com>", "Murali Krishna Ramanathan", "Uber Technologies Inc."]
 name = "polyglot_piranha"
 description = "Piranha is a structural find and replace library based on tree-sitter."
-version = "0.1.2"
+version = "0.1.4"
 edition = "2021"
 include = [
     "build.rs",
@@ -20,6 +20,7 @@ name = "polyglot_piranha"
 path = "src/lib.rs"
 crate-type = ["cdylib", "rlib"]
 
+
 [build-dependencies]
 cc = "1.0.73"
 
@@ -32,7 +33,7 @@ serde = "1.0.136"
 serde_derive = "1.0.136"
 colored = "2.0.0"
 itertools= "0.10.3"
-regex = "1.5.5"
+regex = "1.5.6"
 jwalk= "0.6.0"
 clap = { version = "3.1.12", features = ["derive"] }
 log = "0.4.16"
@@ -50,4 +51,7 @@ pyo3 =  "0.17.1"
 [features]
 extension-module = ["pyo3/extension-module"]
 default = ["extension-module"]
+
+
+
 
