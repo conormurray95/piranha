@@ -31,7 +31,19 @@ def java_demo():
 
 
 
-swift_demo()
-strings_demo()
-java_demo()
+def kt_demo():
+    """
+    This shows how we can use Piranha to execute structural find/replace that hook on the the 
+    pre-built rules.
+    Note how it deletes the enum declaration and consequently the file. 
+    Deletion of the file can be disabled by setting the `delete_file_if_empty` flag to False.
+    """    
+    print("Running the Find/Replace demo for Kt")
+    _ = run_piranha_cli(join(find_Replace_dir, "kotlin_alankar"), join(find_Replace_dir, "kotlin_alankar/configurations"), True)
+
+
+# swift_demo()
+# strings_demo()
+# java_demo()
+kt_demo()
 print("Completed running the Find/Replace demos")
