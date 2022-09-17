@@ -1,6 +1,6 @@
 [package]
 authors = ["Ameya Ketkar <ketkara@uber.com>", "Lazaro Clapp <lazaro@uber.com>", "Murali Krishna Ramanathan", "Uber Technologies Inc."]
-name = "piranha"
+name = "piranha_models"
 description = "Polyglot Piranha is a library for performing structural find and replace with deep cleanup."
 version = "0.1.2"
 edition = "2021"
@@ -10,20 +10,12 @@ include = [
 ]
 license-file = "LICENSE"
 categories = ["structural find-replace", "find-replace", "structural seearch", "structural search and replace", "tree-sitter"]
-
-[workspace]
-members = [
-    "tree_sitter_utils",
-    "piranha_models",
-    "piranha_utilities"
-]
-
-[[bin]]
-name = "polyglot_piranha"
-path = "src/main.rs"
+# [[bin]]
+# name = "polyglot_piranha"
+# path = "src/main.rs"
 
 [lib]
-name = "polyglot_piranha"
+name = "piranha_models"
 path = "src/lib.rs"
 crate-type = ["cdylib", "rlib"]
 
@@ -31,13 +23,11 @@ crate-type = ["cdylib", "rlib"]
 cc = "1.0.73"
 
 [dependencies]
-tree_sitter_utils = { path = "tree_sitter_utils" }
-piranha_models = { path = "piranha_models" }
-piranha_utilities = {path = "piranha_utilities"}
+piranha_utilities = { path = "../piranha_utilities" }
+tree_sitter_utils = { path = "../tree_sitter_utils" }
+
 tree-sitter = "0.20.6"
 tree-sitter-traversal = "0.1.2"
-
-
 json = "0.12.4"
 toml = "0.5.9"
 serde = { version= "1.0.136", default_features= false}

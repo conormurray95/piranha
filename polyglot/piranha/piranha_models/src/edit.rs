@@ -13,22 +13,26 @@ Copyright (c) 2022 Uber Technologies, Inc.
 
 use std::collections::HashMap;
 
+use getset::{CopyGetters, Getters};
 use serde_derive::Serialize;
 use tree_sitter::Range;
 
-use super::matches::Match;
+use tree_sitter_utils::matches::Match;
 use pyo3::prelude::pyclass;
 
-#[derive(Serialize, Debug, Clone)]
+#[derive(Serialize, Debug, Clone, Getters, CopyGetters)]
 #[pyclass]
-pub(crate) struct Edit {
+pub struct Edit {
   // The match representing the target site of the edit
+  #[getset(get = "pub")]
   #[pyo3(get)]
   p_match: Match,
   // The string to replace the substring encompassed by the match
+  #[getset(get = "pub")]
   #[pyo3(get)]
   replacement_string: String,
   // The rule used for creating this match-replace
+  #[getset(get = "pub")]
   #[pyo3(get)]
   matched_rule: String,
 }
@@ -56,15 +60,15 @@ impl Edit {
     self.p_match.range()
   }
 
-  pub(crate) fn replacement_string(&self) -> &str {
-    self.replacement_string.as_ref()
-  }
+  // pub(crate) fn replacement_string(&self) -> &str {
+  //   self.replacement_string.as_ref()
+  // }
 
-  pub(crate) fn matched_rule(&self) -> String {
-    self.matched_rule.clone()
-  }
+  // pub(crate) fn matched_rule(&self) -> String {
+  //   self.matched_rule.clone()
+  // }
 
-  pub(crate) fn matches(&self) -> &HashMap<String, String> {
+  pub fn matches(&self) -> &HashMap<String, String> {
     self.p_match.matches()
   }
 }

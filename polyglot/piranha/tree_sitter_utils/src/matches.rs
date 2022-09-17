@@ -13,22 +13,25 @@ Copyright (c) 2022 Uber Technologies, Inc.
 
 use std::collections::HashMap;
 
+use getset::{CopyGetters, Getters};
 use pyo3::prelude::pyclass;
 use serde_derive::Serialize;
 
-#[derive(Serialize, Debug, Clone)]
+#[derive(Serialize, Debug, Clone,  Getters, CopyGetters)]
 #[pyclass]
-pub(crate) struct Match {
+pub struct Match {
   // Range of the entire AST node captured by the match
+//   #[getset(get = "pub")]
   #[pyo3(get)]
   range: Range,
   // The mapping between tags and string representation of the AST captured.
+  #[getset(get = "pub")]
   #[pyo3(get)]
   matches: HashMap<String, String>,
 }
 
 impl Match {
-  pub(crate) fn new(range: tree_sitter::Range, matches: HashMap<String, String>) -> Self {
+  pub fn new(range: tree_sitter::Range, matches: HashMap<String, String>) -> Self {
     Self {
       range: Range {
         start_byte: range.start_byte,
@@ -47,7 +50,7 @@ impl Match {
   }
 
   /// Get the edit's replacement range.
-  pub(crate) fn range(&self) -> tree_sitter::Range {
+  pub fn range(&self) -> tree_sitter::Range {
     tree_sitter::Range {
       start_byte: self.range.start_byte,
       end_byte: self.range.end_byte,
@@ -62,9 +65,9 @@ impl Match {
     }
   }
 
-  pub(crate) fn matches(&self) -> &HashMap<String, String> {
-    &self.matches
-  }
+//   pub(crate) fn matches(&self) -> &HashMap<String, String> {
+//     &self.matches
+//   }
 }
 /// A range of positions in a multi-line text document, both in terms of bytes and of
 /// rows and columns.

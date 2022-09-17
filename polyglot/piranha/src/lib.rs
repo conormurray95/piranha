@@ -11,17 +11,17 @@ Copyright (c) 2022 Uber Technologies, Inc.
  limitations under the License.
 */
 
-use config::CommandLineArguments;
-use models::{
+use piranha_models::{
   piranha_arguments::PiranhaArguments, piranha_output::PiranhaOutputSummary,
   source_code_unit::SourceCodeUnit,
+  config::CommandLineArguments
 };
 
-mod config;
-pub mod models;
+// mod config;
+// pub mod models;
 #[cfg(test)]
 mod tests;
-pub mod utilities;
+// pub mod utilities;
 
 use std::{collections::HashMap, path::PathBuf};
 
@@ -31,8 +31,8 @@ use jwalk::WalkDir;
 use log::info;
 use regex::Regex;
 use tree_sitter::Parser;
-
-use crate::{models::rule_store::RuleStore, utilities::read_file};
+use piranha_models::rule_store::RuleStore;
+use piranha_utilities::read_file;
 use pyo3::prelude::{pyfunction, pymodule, wrap_pyfunction, PyModule, PyResult, Python};
 
 /// Executes piranha for the provided configuration at {path_to_configurations} upon the given {path_to_codebase}.
@@ -83,8 +83,6 @@ pub fn execute_piranha(
     .map(PiranhaOutputSummary::new)
     .collect_vec()
 }
-
-impl SourceCodeUnit {}
 
 // Maintains the state of Piranha and the updated content of files in the source code.
 struct FlagCleaner {

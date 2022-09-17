@@ -15,11 +15,11 @@ use std::path::{Path, PathBuf};
 
 use log::error;
 
-use crate::config::CommandLineArguments;
+use piranha_models::config::CommandLineArguments;
 use crate::execute_piranha;
-use crate::models::piranha_arguments::PiranhaArguments;
-use crate::models::piranha_output::PiranhaOutputSummary;
-use crate::utilities::{eq_without_whitespace, find_file, read_file};
+use piranha_models::piranha_arguments::PiranhaArguments;
+use piranha_models::piranha_output::PiranhaOutputSummary;
+use piranha_utilities::{eq_without_whitespace, find_file, read_file};
 
 mod test_piranha_java;
 mod test_piranha_kt;

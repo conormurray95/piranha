@@ -15,10 +15,12 @@ Copyright (c) 2022 Uber Technologies, Inc.
 use std::{fs, time::Instant};
 
 use log::info;
-use polyglot_piranha::{
-  execute_piranha, models::piranha_arguments::PiranhaArguments,
-  models::piranha_output::PiranhaOutputSummary,
-};
+use polyglot_piranha::execute_piranha;
+use piranha_models::{piranha_arguments::PiranhaArguments, piranha_output::PiranhaOutputSummary};
+// use polyglot_piranha::{
+//   execute_piranha, models::piranha_arguments::PiranhaArguments,
+//   models::piranha_output::PiranhaOutputSummary,
+// };
 
 fn main() {
   let now = Instant::now();

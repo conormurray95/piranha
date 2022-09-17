@@ -13,27 +13,32 @@ Copyright (c) 2022 Uber Technologies, Inc.
 
 //! Defines the traits containing with utility functions that interface with tree-sitter.
 
-use crate::{
-  models::{matches::Match},
-  utilities::MapOfVec,
-};
+use crate::matches::Match;
 use colored::Colorize;
 use itertools::Itertools;
 use log::info;
 use std::collections::HashMap;
 #[cfg(test)]
+mod tests;
 use tree_sitter::Parser;
 use tree_sitter::{InputEdit, Language, Node, Point, Query, QueryCapture, QueryCursor, Range};
+pub mod matches;
 
-use super::eq_without_whitespace;
+use std::hash::Hash;
 
-pub(crate) trait TreeSitterHelpers {
+/// Compares two strings, ignoring whitespace
+pub fn eq_without_whitespace(s1: &str, s2: &str) -> bool {
+  s1.split_whitespace()
+    .collect::<String>()
+    .eq(&s2.split_whitespace().collect::<String>())
+}
+pub trait TreeSitterHelpers {
   /// Gets the tree-sitter language model.
   fn get_language(&self) -> Language;
   /// Compiles query string to `tree_sitter::Query`
   fn create_query(&self, language: Language) -> Query;
   /// Determines if the given node kind is a comment for the respective language (`self`)
-  fn is_comment(&self, kind: &str) -> bool ;
+  fn is_comment(&self, kind: &str) -> bool;
 }
 
 impl TreeSitterHelpers for String {
@@ -66,43 +71,43 @@ impl TreeSitterHelpers for String {
 }
 
 #[rustfmt::skip]
-pub(crate) trait PiranhaHelpers {
+  pub trait TreeSitterQueryHelpers {
+  
+       /// Applies the query upon `self`, and gets the first match
+      /// # Arguments
+      /// * `source_code` - the corresponding source code string for the node.
+      /// * `query` - the query to be applied
+      ///
+      /// # Returns
+      /// List of matches (list of captures), grouped by the outermost tag of the query
+      fn get_query_capture_groups(&self, source_code: &str, query: &Query) -> HashMap<Range, Vec<Vec<QueryCapture>>> ;
+  
+      /// Checks if the given rule satisfies the constraint of the rule, under the substitutions obtained upon matching `rule.query`
+      // fn satisfies_constraint(&self, source_code_unit: SourceCodeUnit, rule: &Rule, substitutions: &HashMap<String, String>,rule_store: &mut RuleStore,) -> bool ;
+      /// Applies the query upon `self`, and gets the first match
+      /// # Arguments
+      /// * `source_code` - the corresponding source code string for the node.
+      /// * `query` - the query to be applied
+      /// * `recursive` - if `true` it matches the query to `self` and `self`'s sub-ASTs, else it matches the `query` only to `self`.
+      ///
+      /// # Returns
+      /// The range of the match in the source code and the corresponding mapping from tags to code snippets.
+      fn get_all_matches_for_query(&self, source_code: String, query: &Query, recursive: bool, replace_node_tag: Option<String>) -> Vec<Match> ;
+  
+      /// Applies the query upon `self`, and gets all the matches
+      /// # Arguments
+      /// * `source_code` - the corresponding source code string for the node.
+      /// * `query` - the query to be applied
+      /// * `recursive` - if `true` it matches the query to `self` and `self`'s sub-ASTs, else it matches the `query` only to `self`.
+      ///
+      /// # Returns
+      /// A vector of `tuples` containing the range of the matches in the source code and the corresponding mapping for the tags (to code snippets).
+      /// By default it returns the range of the outermost node for each query match.
+      /// If `replace_node` is provided in the rule, it returns the range of the node corresponding to that tag.
+      fn get_match_for_query(&self, source_code: &str, query: &Query, recursive: bool) -> Option<Match>;
+  }
 
-     /// Applies the query upon `self`, and gets the first match
-    /// # Arguments
-    /// * `source_code` - the corresponding source code string for the node.
-    /// * `query` - the query to be applied
-    ///
-    /// # Returns
-    /// List of matches (list of captures), grouped by the outermost tag of the query
-    fn get_query_capture_groups(&self, source_code: &str, query: &Query) -> HashMap<Range, Vec<Vec<QueryCapture>>> ;
-
-    /// Checks if the given rule satisfies the constraint of the rule, under the substitutions obtained upon matching `rule.query`
-    // fn satisfies_constraint(&self, source_code_unit: SourceCodeUnit, rule: &Rule, substitutions: &HashMap<String, String>,rule_store: &mut RuleStore,) -> bool ;
-    /// Applies the query upon `self`, and gets the first match
-    /// # Arguments
-    /// * `source_code` - the corresponding source code string for the node.
-    /// * `query` - the query to be applied
-    /// * `recursive` - if `true` it matches the query to `self` and `self`'s sub-ASTs, else it matches the `query` only to `self`.
-    ///
-    /// # Returns
-    /// The range of the match in the source code and the corresponding mapping from tags to code snippets.
-    fn get_all_matches_for_query(&self, source_code: String, query: &Query, recursive: bool, replace_node_tag: Option<String>) -> Vec<Match> ;
-
-    /// Applies the query upon `self`, and gets all the matches
-    /// # Arguments
-    /// * `source_code` - the corresponding source code string for the node.
-    /// * `query` - the query to be applied
-    /// * `recursive` - if `true` it matches the query to `self` and `self`'s sub-ASTs, else it matches the `query` only to `self`.
-    ///
-    /// # Returns
-    /// A vector of `tuples` containing the range of the matches in the source code and the corresponding mapping for the tags (to code snippets).
-    /// By default it returns the range of the outermost node for each query match.
-    /// If `replace_node` is provided in the rule, it returns the range of the node corresponding to that tag.
-    fn get_match_for_query(&self, source_code: &str, query: &Query, recursive: bool) -> Option<Match>;
-}
-
-impl PiranhaHelpers for Node<'_> {
+impl TreeSitterQueryHelpers for Node<'_> {
   /// Checks if the given rule satisfies the constraint of the rule, under the substitutions obtained upon matching `rule.query`
   fn get_match_for_query(
     &self, source_code: &str, query: &Query, recursive: bool,
@@ -246,7 +251,7 @@ fn get_range_for_replace_node(
 /// Replaces the given byte range (`replace_range`) with the `replacement`.
 /// Returns tree-sitter's edit representation along with updated source code.
 /// Note: This method does not update `self`.
-pub(crate) fn get_tree_sitter_edit(
+pub fn get_tree_sitter_edit(
   code: String, replace_range: Range, replacement: &str,
 ) -> (String, InputEdit) {
   // Log the edit
@@ -258,7 +263,7 @@ pub(crate) fn get_tree_sitter_edit(
     replacement_snippet_fmt.push_str(&format!("\n to \n{}", replacement.italic()))
   }
   #[rustfmt::skip]
-  info!("\n {} at ({:?}) -\n {}", edit_kind , &replace_range, replacement_snippet_fmt);
+    info!("\n {} at ({:?}) -\n {}", edit_kind , &replace_range, replacement_snippet_fmt);
   // Create the new source code content by appropriately
   // replacing the range with the replacement string.
   let new_source_code = [
@@ -322,7 +327,7 @@ fn _get_tree_sitter_edit(
 ///     replacement pattern.
 ///
 /// Note that,  it escapes newline characters for tree-sitter-queries.
-pub(crate) fn substitute_tags(
+pub fn substitute_tags(
   input_string: String, substitutions: &HashMap<String, String>, is_tree_sitter_query: bool,
 ) -> String {
   let mut output = input_string;
@@ -340,7 +345,7 @@ pub(crate) fn substitute_tags(
 }
 
 /// Get the smallest node within `self` that spans the given range.
-pub(crate) fn get_node_for_range(root_node: Node, start_byte: usize, end_byte: usize) -> Node {
+pub fn get_node_for_range(root_node: Node, start_byte: usize, end_byte: usize) -> Node {
   root_node
     .descendant_for_byte_range(start_byte, end_byte)
     .unwrap()
@@ -361,7 +366,7 @@ fn get_non_str_eq_parent(node: Node, source_code: String) -> Option<Node> {
 }
 
 /// Returns the node, its parent, grand parent and great grand parent
-pub(crate) fn get_context<'a>(
+pub fn get_context<'a>(
   root_node: Node, prev_node: Node<'a>, source_code: String, count: u8,
 ) -> Vec<Node<'a>> {
   let mut output = Vec::new();
@@ -374,7 +379,7 @@ pub(crate) fn get_context<'a>(
   output
 }
 
-pub(crate) fn get_replace_range(input_edit: InputEdit) -> Range {
+pub fn get_replace_range(input_edit: InputEdit) -> Range {
   Range {
     start_byte: input_edit.start_byte,
     end_byte: input_edit.new_end_byte,
@@ -383,15 +388,28 @@ pub(crate) fn get_replace_range(input_edit: InputEdit) -> Range {
   }
 }
 
-#[cfg(test)]
-pub(crate) fn get_parser(language: String) -> Parser {
-  let mut parser = Parser::new();
-  parser
-    .set_language(language.get_language())
-    .expect("Could not set the language for the parser.");
-  parser
+pub fn get_parser(language: String) -> Parser {
+    let mut parser = Parser::new();
+    parser
+      .set_language(language.get_language())
+      .expect("Could not set the language for the parser.");
+    parser
+  }
+  
+
+pub trait MapOfVec<T, V> {
+  fn collect(&mut self, key: T, value: V);
 }
 
-#[cfg(test)]
-#[path = "unit_tests/tree_sitter_utilities_test.rs"]
-mod tree_sitter_utilities_test;
+// Implements trait `MapOfVec` for `HashMap<T, Vec<U>>`.
+impl<T: Hash + Eq, U> MapOfVec<T, U> for HashMap<T, Vec<U>> {
+  // Adds the given `value` to the vector corresponding to the `key`.
+  // Like an adjacency list.
+  fn collect(self: &mut HashMap<T, Vec<U>>, key: T, value: U) {
+    self.entry(key).or_insert_with(Vec::new).push(value);
+  }
+}
+
+//   #[cfg(test)]
+//   #[path = "unit_tests/tree_sitter_utilities_test.rs"]
+//   mod tree_sitter_utilities_test;

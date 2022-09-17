@@ -17,11 +17,7 @@ use colored::Colorize;
 use serde_derive::Deserialize;
 use tree_sitter::Node;
 
-use crate::utilities::{
-  tree_sitter_utilities::{substitute_tags},
-  MapOfVec,
-};
-
+use tree_sitter_utils::{substitute_tags, MapOfVec};
 use super::{
   constraint::Constraint, rule_store::RuleStore,
   source_code_unit::SourceCodeUnit,
@@ -32,12 +28,12 @@ static CLEAN_UP: &str = "Cleanup Rule";
 
 #[derive(Deserialize, Debug, Clone, Default)]
 // Represents the `rules.toml` file
-pub(crate) struct Rules {
-  pub(crate) rules: Vec<Rule>,
+pub struct Rules {
+  pub rules: Vec<Rule>,
 }
 
 #[derive(Deserialize, Debug, Clone, Default)]
-pub(crate) struct Rule {
+pub struct Rule {
   /// Name of the rule. (It is unique)
   name: String,
   /// Tree-sitter query as string
@@ -57,22 +53,22 @@ pub(crate) struct Rule {
 }
 
 impl Rule {
-  pub(crate) fn is_seed_rule(&self) -> bool {
+  pub fn is_seed_rule(&self) -> bool {
     self.groups().contains(&SEED.to_string())
   }
 
   // Dummy rules are helper rules that make it easier to define the rule graph.
-  pub(crate) fn is_dummy_rule(&self) -> bool {
+  pub fn is_dummy_rule(&self) -> bool {
     self.query.is_none() && self.replace.is_none()
   }
 
   // Checks if a rule is `match-only` i.e. it has a query but no replace.
-  pub(crate) fn is_match_only_rule(&self) -> bool {
+  pub fn is_match_only_rule(&self) -> bool {
     self.query.is_some() && self.replace.is_none()
   }
 
   /// Instantiate `self` with substitutions or panic.
-  pub(crate) fn instantiate(&self, substitutions: &HashMap<String, String>) -> Rule {
+  pub fn instantiate(&self, substitutions: &HashMap<String, String>) -> Rule {
     if let Ok(r) = self.try_instantiate(substitutions) {
       return r;
     }
@@ -82,7 +78,7 @@ impl Rule {
 
   /// Tries to instantiate the rule (`self`) based on the substitutions.
   /// Note this could fail if the `substitutions` doesn't contain mappings for each hole.
-  pub(crate) fn try_instantiate(
+  pub fn try_instantiate(
     &self, substitutions: &HashMap<String, String>,
   ) -> Result<Rule, String> {
     let relevant_substitutions = self
@@ -113,7 +109,7 @@ impl Rule {
 
   /// Groups the rules based on the field `rule.groups`
   /// Note: a rule can belong to more than one group.
-  pub(crate) fn group_rules(
+  pub fn group_rules(
     rules: &Vec<Rule>,
   ) -> (HashMap<String, Rule>, HashMap<String, Vec<String>>) {
     let mut rules_by_name = HashMap::new();
@@ -129,7 +125,7 @@ impl Rule {
 
   /// Records the string that should be grepped in order to find files that
   /// potentially could match this global rule.
-  pub(crate) fn add_grep_heuristics_for_global_rules(
+  pub fn add_grep_heuristics_for_global_rules(
     &mut self, substitutions: &HashMap<String, String>,
   ) {
     let mut gh = HashSet::new();
@@ -142,7 +138,7 @@ impl Rule {
   }
 
   /// Adds the rule to a new group - "SEED" if applicable.
-  pub(crate) fn add_to_seed_rules_group(&mut self) {
+  pub fn add_to_seed_rules_group(&mut self) {
     if self.groups().contains(&CLEAN_UP.to_string()) {
       return;
     }
@@ -154,42 +150,42 @@ impl Rule {
     }
   }
 
-  pub(crate) fn replace_node(&self) -> String {
+  pub fn replace_node(&self) -> String {
     if let Some(rn) = &self.replace_node {
       return rn.to_string();
     }
     panic!("No replace_node pattern!")
   }
 
-  pub(crate) fn query(&self) -> String {
+  pub fn query(&self) -> String {
     if let Some(q) = &self.query {
       return q.to_string();
     }
     panic!("No query pattern!")
   }
 
-  pub(crate) fn replace(&self) -> String {
+  pub fn replace(&self) -> String {
     if let Some(rp) = &self.replace {
       return rp.to_string();
     }
     panic!("No replace pattern!")
   }
 
-  pub(crate) fn constraints(&self) -> HashSet<Constraint> {
+  pub fn constraints(&self) -> HashSet<Constraint> {
     match &self.constraints {
       Some(cs) => cs.clone(),
       None => HashSet::new(),
     }
   }
 
-  pub(crate) fn grep_heuristics(&self) -> HashSet<String> {
+  pub fn grep_heuristics(&self) -> HashSet<String> {
     match &self.grep_heuristics {
       Some(cs) => cs.clone(),
       None => HashSet::new(),
     }
   }
 
-  pub(crate) fn holes(&self) -> HashSet<String> {
+  pub fn holes(&self) -> HashSet<String> {
     match &self.holes {
       Some(cs) => cs.clone(),
       None => HashSet::new(),
@@ -203,33 +199,33 @@ impl Rule {
     }
   }
 
-  pub(crate) fn update_replace(&mut self, substitutions: &HashMap<String, String>) {
+  pub fn update_replace(&mut self, substitutions: &HashMap<String, String>) {
     self.set_replace(substitute_tags(self.replace(), substitutions, false));
   }
 
-  pub(crate) fn update_query(&mut self, substitutions: &HashMap<String, String>) {
+  pub fn update_query(&mut self, substitutions: &HashMap<String, String>) {
     self.set_query(substitute_tags(self.query(), substitutions, false));
   }
 
-  pub(crate) fn name(&self) -> String {
+  pub fn name(&self) -> String {
     String::from(&self.name)
   }
 
 
   
 
-  pub(crate) fn set_replace(&mut self, replace: String) {
+  pub fn set_replace(&mut self, replace: String) {
     self.replace = Some(replace);
   }
 
-  pub(crate) fn set_query(&mut self, query: String) {
+  pub fn set_query(&mut self, query: String) {
     self.query = Some(query);
   }
 }
 
 #[cfg(test)]
 impl Rule {
-  pub(crate) fn new(
+  pub fn new(
     name: &str, query: &str, replace_node: &str, replace: &str, holes: HashSet<String>,
     constraints: HashSet<Constraint>,
   ) -> Self {
@@ -251,7 +247,7 @@ impl Rule {
 }
 
 #[rustfmt::skip]
-pub(crate) trait SatisfiesConstraint {
+pub trait SatisfiesConstraint {
     // / Checks if the given rule satisfies the constraint of the rule, under the substitutions obtained upon matching `rule.query`
     fn is_satisfied(&self, source_code_unit: &SourceCodeUnit, rule: &Rule, substitutions: &HashMap<String, String>,rule_store: &mut RuleStore,) -> bool ;
 }
@@ -277,6 +273,6 @@ fn is_satisfied(
 }
 } 
 
-#[cfg(test)]
-#[path = "unit_tests/rule_test.rs"]
-mod rule_test;
+// #[cfg(test)]
+// #[path = "unit_tests/rule_test.rs"]
+// mod rule_test;

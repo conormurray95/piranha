@@ -12,19 +12,18 @@ Copyright (c) 2022 Uber Technologies, Inc.
 */
 use std::collections::HashSet;
 
-use crate::models::rule::SatisfiesConstraint;
+use crate::rule::SatisfiesConstraint;
 
 use {
-  super::Rule,
   crate::{
-    models::{constraint::Constraint, rule_store::RuleStore, source_code_unit::SourceCodeUnit},
-    utilities::tree_sitter_utilities::get_parser,
-    models::piranha_arguments::{PiranhaArgumentsBuilder}
+    {rule::Rule, constraint::Constraint, rule_store::RuleStore, source_code_unit::SourceCodeUnit},
+    // utilities::tree_sitter_utilities::get_parser,
+    piranha_arguments::{PiranhaArgumentsBuilder}
   },
   std::collections::HashMap,
   std::path::PathBuf,
 };
-
+use tree_sitter_utils::get_parser;
 
 /// Tests whether a valid rule can be correctly instantiated given valid substitutions.
 #[test]

@@ -18,12 +18,12 @@ use getset::{CopyGetters, Getters};
 use log::info;
 use std::{collections::HashMap, path::PathBuf};
 use tree_sitter::Language;
-
 use crate::{
   config::CommandLineArguments,
-  models::piranha_config::PiranhaConfiguration,
-  utilities::{read_toml, tree_sitter_utilities::TreeSitterHelpers},
+  piranha_config::PiranhaConfiguration,
 };
+use piranha_utilities::{read_toml};
+use tree_sitter_utils::{TreeSitterHelpers};
 
 #[derive(Clone, Builder, Getters, CopyGetters)]
 #[builder(default)]
@@ -79,7 +79,7 @@ impl PiranhaArguments {
     Self::new(CommandLineArguments::parse())
   }
 
-  pub(crate) fn new(args: CommandLineArguments) -> Self {
+  pub fn new(args: CommandLineArguments) -> Self {
     let path_to_piranha_argument_file =
       PathBuf::from(args.path_to_configurations.as_str()).join("piranha_arguments.toml");
 

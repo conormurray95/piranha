@@ -14,45 +14,45 @@ Copyright (c) 2022 Uber Technologies, Inc.
 use itertools::Itertools;
 use serde_derive::Deserialize;
 
-use crate::utilities::tree_sitter_utilities::{
-  get_node_for_range, substitute_tags, PiranhaHelpers,
+use tree_sitter_utils::{
+  get_node_for_range, substitute_tags, TreeSitterQueryHelpers,
 };
 
 use super::{rule_store::RuleStore, source_code_unit::SourceCodeUnit};
 
 // Represents the content in the `scope_config.toml` file
 #[derive(Deserialize, Debug, Clone, Hash, PartialEq, Eq, Default)]
-pub(crate) struct ScopeConfig {
+pub struct ScopeConfig {
   scopes: Vec<ScopeGenerator>,
 }
 
 impl ScopeConfig {
   /// Get a reference to the scope `config's` scopes.
   #[must_use]
-  pub(crate) fn scopes(&self) -> Vec<ScopeGenerator> {
+  pub fn scopes(&self) -> Vec<ScopeGenerator> {
     self.scopes.iter().cloned().collect_vec()
   }
 }
 
 // Represents an entry in the `scope_config.toml` file
 #[derive(Deserialize, Debug, Clone, Hash, PartialEq, Eq, Default)]
-pub(crate) struct ScopeGenerator {
+pub struct ScopeGenerator {
   name: String,
   rules: Vec<ScopeQueryGenerator>,
 }
 
 impl ScopeGenerator {
-  pub(crate) fn name(&self) -> &str {
+  pub fn name(&self) -> &str {
     self.name.as_ref()
   }
 
-  pub(crate) fn rules(&self) -> Vec<ScopeQueryGenerator> {
+  pub fn rules(&self) -> Vec<ScopeQueryGenerator> {
     self.rules.iter().cloned().collect_vec()
   }
 
   /// Generate a tree-sitter based query representing the scope of the previous edit.
   /// We generate these scope queries by matching the rules provided in `<lang>_scopes.toml`.
-  pub(crate) fn get_scope_query(
+  pub fn get_scope_query(
     source_code_unit: SourceCodeUnit, scope_level: &str, start_byte: usize, end_byte: usize,
     rules_store: &mut RuleStore,
   ) -> String {
@@ -86,24 +86,24 @@ impl ScopeGenerator {
 }
 
 #[derive(Deserialize, Debug, Clone, Hash, PartialEq, Eq, Default)]
-pub(crate) struct ScopeQueryGenerator {
+pub struct ScopeQueryGenerator {
   matcher: String, // a tree-sitter query matching some enclosing AST pattern (like method or class)
   generator: String, // a tree-sitter query matching the exact AST node
 }
 
 impl ScopeQueryGenerator {
-  pub(crate) fn matcher(&self) -> String {
+  pub fn matcher(&self) -> String {
     String::from(&self.matcher)
   }
 
-  pub(crate) fn generator(&self) -> String {
+  pub fn generator(&self) -> String {
     String::from(&self.generator)
   }
 }
 
 #[cfg(test)]
 impl ScopeQueryGenerator {
-  fn new(matcher: &str, generator: &str) -> ScopeQueryGenerator {
+  pub(crate) fn new(matcher: &str, generator: &str) -> ScopeQueryGenerator {
     ScopeQueryGenerator {
       matcher: matcher.to_string(),
       generator: generator.to_string(),
@@ -112,7 +112,7 @@ impl ScopeQueryGenerator {
 }
 #[cfg(test)]
 impl ScopeGenerator {
-  fn new(name: &str, rules: Vec<ScopeQueryGenerator>) -> ScopeGenerator {
+  pub(crate) fn new(name: &str, rules: Vec<ScopeQueryGenerator>) -> ScopeGenerator {
     ScopeGenerator {
       name: name.to_string(),
       rules,
@@ -120,6 +120,6 @@ impl ScopeGenerator {
   }
 }
 
-#[cfg(test)]
-#[path = "unit_tests/scopes_test.rs"]
-mod scopes_test;
+// #[cfg(test)]
+// #[path = "unit_tests/scopes_test.rs"]
+// mod scopes_test;

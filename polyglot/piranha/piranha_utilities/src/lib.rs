@@ -11,17 +11,21 @@ Copyright (c) 2022 Uber Technologies, Inc.
  limitations under the License.
 */
 
-pub(crate) mod tree_sitter_utilities;
+// pub mod tree_sitter_utilities;
 use std::collections::HashMap;
 use std::fs::File;
-#[cfg(test)]
+
 use std::fs::{self, DirEntry};
 use std::hash::Hash;
 use std::io::{BufReader, Read};
 use std::path::PathBuf;
 
+#[cfg(test)]
+mod tests;
+
+
 // Reads a file.
-pub(crate) fn read_file(file_path: &PathBuf) -> Result<String, String> {
+pub fn read_file(file_path: &PathBuf) -> Result<String, String> {
   File::open(&file_path)
     .map(|file| {
       let mut content = String::new();
@@ -32,7 +36,7 @@ pub(crate) fn read_file(file_path: &PathBuf) -> Result<String, String> {
 }
 
 // Reads a toml file. In case of error, it returns a default value (if return_default is true) else panics.
-pub(crate) fn read_toml<T>(file_path: &PathBuf, return_default: bool) -> T
+pub fn read_toml<T>(file_path: &PathBuf, return_default: bool) -> T
 where
   T: serde::de::DeserializeOwned + Default,
 {
@@ -51,7 +55,7 @@ where
   }
 }
 
-pub(crate) trait MapOfVec<T, V> {
+pub trait MapOfVec<T, V> {
   fn collect(&mut self, key: T, value: V);
 }
 
@@ -65,15 +69,15 @@ impl<T: Hash + Eq, U> MapOfVec<T, U> for HashMap<T, Vec<U>> {
 }
 
 /// Compares two strings, ignoring whitespace
-pub(crate) fn eq_without_whitespace(s1: &str, s2: &str) -> bool {
+pub fn eq_without_whitespace(s1: &str, s2: &str) -> bool {
   s1.split_whitespace()
     .collect::<String>()
     .eq(&s2.split_whitespace().collect::<String>())
 }
 
 /// Checks if the given `dir_entry` is a file named `file_name`
-#[cfg(test)] // Rust analyzer FP
-pub(crate) fn has_name(dir_entry: &DirEntry, file_name: &str) -> bool {
+// #[cfg(test)] // Rust analyzer FP
+pub fn has_name(dir_entry: &DirEntry, file_name: &str) -> bool {
   dir_entry
     .path()
     .file_name()
@@ -82,8 +86,8 @@ pub(crate) fn has_name(dir_entry: &DirEntry, file_name: &str) -> bool {
 }
 
 /// Returns the file with the given name within the given directory.
-#[cfg(test)] // Rust analyzer FP
-pub(crate) fn find_file(input_dir: &PathBuf, name: &str) -> PathBuf {
+// #[cfg(test)] // Rust analyzer FP
+pub fn find_file(input_dir: &PathBuf, name: &str) -> PathBuf {
   fs::read_dir(input_dir)
     .unwrap()
     .filter_map(|d| d.ok())
@@ -91,7 +95,3 @@ pub(crate) fn find_file(input_dir: &PathBuf, name: &str) -> PathBuf {
     .unwrap()
     .path()
 }
-
-#[cfg(test)]
-#[path = "unit_tests/utilities_test.rs"]
-mod utilities_test;

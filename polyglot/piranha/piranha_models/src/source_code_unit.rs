@@ -22,27 +22,28 @@ use regex::Regex;
 use tree_sitter::{InputEdit, Node, Parser, Range, Tree};
 use tree_sitter_traversal::{traverse, Order};
 
-use crate::utilities::{
+use piranha_utilities::{
   eq_without_whitespace,
-  tree_sitter_utilities::{get_replace_range, get_tree_sitter_edit, TreeSitterHelpers, get_context, substitute_tags},
+  // tree_sitter_utilities::{get_replace_range, get_tree_sitter_edit, TreeSitterHelpers, get_context, substitute_tags},
 };
-
-use super::{
-  edit::Edit, matches::Match, piranha_arguments::PiranhaArguments, rule::Rule, rule::SatisfiesConstraint,
+use tree_sitter_utils::{get_replace_range, get_tree_sitter_edit,get_node_for_range, TreeSitterHelpers, get_context, substitute_tags, TreeSitterQueryHelpers};
+use tree_sitter_utils::matches::Match;
+use crate::{ 
+  edit::Edit, piranha_arguments::PiranhaArguments, rule::Rule, rule::SatisfiesConstraint,
   rule_store::RuleStore,
 };
 
 use getset::{CopyGetters, Getters};
-use crate::models::scopes::ScopeGenerator;
-use crate::utilities::tree_sitter_utilities::PiranhaHelpers;
+use crate::scopes::ScopeGenerator;
+// use crate::utilities::tree_sitter_utilities::PiranhaHelpers;
 use crate::{
-  models::rule_store::{GLOBAL, PARENT},
-  utilities::tree_sitter_utilities::get_node_for_range,
+  rule_store::{GLOBAL, PARENT},
+  // utilities::tree_sitter_utilities::get_node_for_range,
 };
 
 // Maintains the updated source code content and AST of the file
 #[derive(Clone, Getters, CopyGetters)]
-pub(crate) struct SourceCodeUnit {
+pub struct SourceCodeUnit {
   // The tree representing the file
   ast: Tree,
   // The content of a file
@@ -67,7 +68,7 @@ pub(crate) struct SourceCodeUnit {
 }
 
 impl SourceCodeUnit {
-  pub(crate) fn new(
+  pub fn new(
     parser: &mut Parser, code: String, substitutions: &HashMap<String, String>, path: &Path,
     piranha_arguments: &PiranhaArguments,
   ) -> Self {
@@ -83,14 +84,14 @@ impl SourceCodeUnit {
     }
   }
 
-  pub(crate) fn root_node(&self) -> Node<'_> {
+  pub fn root_node(&self) -> Node<'_> {
     self.ast.root_node()
   }
 
   /// Writes the current contents of `code` to the file system.
   /// Based on the user's specifications, this function will delete a file if empty
   /// and replace three consecutive newline characters with two.
-  pub(crate) fn persist(&self, piranha_arguments: &PiranhaArguments) {
+  pub fn persist(&self, piranha_arguments: &PiranhaArguments) {
     if self.code.as_str().is_empty() {
       if *piranha_arguments.delete_file_if_empty() {
         _ = fs::remove_file(&self.path).expect("Unable to Delete file");
@@ -106,7 +107,7 @@ impl SourceCodeUnit {
     }
   }
 
-  fn apply_edit(&mut self, edit: &Edit, parser: &mut Parser) -> InputEdit {
+  pub(crate) fn apply_edit(&mut self, edit: &Edit, parser: &mut Parser) -> InputEdit {
     // Get the tree_sitter's input edit representation
     let mut applied_edit = self._apply_edit(
       edit.replacement_range(),
@@ -300,18 +301,18 @@ impl SourceCodeUnit {
   //   &self.substitutions
   // }
 
-  pub(crate) fn add_to_substitutions(
+  pub fn add_to_substitutions(
     &mut self, new_entries: &HashMap<String, String>, rule_store: &mut RuleStore,
   ) {
     let _ = &self.substitutions.extend(new_entries.clone());
     rule_store.add_global_tags(new_entries);
   }
 
-  pub(crate) fn rewrites_mut(&mut self) -> &mut Vec<Edit> {
+  pub fn rewrites_mut(&mut self) -> &mut Vec<Edit> {
     &mut self.rewrites
   }
 
-  pub(crate) fn matches_mut(&mut self) -> &mut Vec<(String, Match)> {
+  pub fn matches_mut(&mut self) -> &mut Vec<(String, Match)> {
     &mut self.matches
   }
 
@@ -457,7 +458,7 @@ impl SourceCodeUnit {
         // Apply the matched rule to the parent
         let applied_edit = self.apply_edit(&edit, parser);
         current_replace_range = get_replace_range(applied_edit);
-        current_rule = edit.matched_rule();
+        current_rule = edit.matched_rule().to_string();
         // Add the (tag, code_snippet) mapping to substitution table.
         self.add_to_substitutions(edit.matches(), rules_store);
       } else {
@@ -517,7 +518,7 @@ impl SourceCodeUnit {
   }
 
   /// Apply all `rules` sequentially.
-  pub(crate) fn apply_rules(
+  pub fn apply_rules(
     &mut self, rules_store: &mut RuleStore, rules: &[Rule], parser: &mut Parser,
     scope_query: Option<String>,
   ) {
@@ -528,7 +529,7 @@ impl SourceCodeUnit {
 
   // Apply all the `rules` to the node, parent, grand parent and great grand parent.
   // Short-circuit on the first match.
-  pub(crate) fn get_edit_for_context(&self,
+  pub fn get_edit_for_context(&self,
     previous_edit_start: usize, previous_edit_end: usize,
     rules_store: &mut RuleStore, rules: &Vec<Rule>,
   ) -> Option<Edit> {
@@ -560,7 +561,7 @@ impl SourceCodeUnit {
   }
 
   /// Gets the first match for the rule in `self`
-  pub(crate) fn get_matches(
+  pub fn get_matches(
     &self, rule: Rule, rule_store: &mut RuleStore, node: Node,
     recursive: bool,
   ) -> Vec<Match> {
@@ -599,7 +600,7 @@ impl SourceCodeUnit {
   }
 
   /// Gets the first match for the rule in `self`
-  pub(crate) fn get_edit(
+  pub fn get_edit(
     &self, rule: Rule, rule_store: &mut RuleStore, node: Node,
     recursive: bool,
   ) -> Option<Edit> {
@@ -616,6 +617,6 @@ impl SourceCodeUnit {
   
 }
 
-#[cfg(test)]
-#[path = "unit_tests/source_code_unit_test.rs"]
-mod source_code_unit_test;
+// #[cfg(test)]
+// #[path = "unit_tests/source_code_unit_test.rs"]
+// mod source_code_unit_test;

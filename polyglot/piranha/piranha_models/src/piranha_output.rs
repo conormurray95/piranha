@@ -17,7 +17,8 @@ use std::path::PathBuf;
 use itertools::Itertools;
 use serde_derive::Serialize;
 
-use super::{edit::Edit, matches::Match, source_code_unit::SourceCodeUnit};
+use tree_sitter_utils::matches::Match;
+use super::{edit::Edit, source_code_unit::SourceCodeUnit};
 use pyo3::prelude::pyclass;
 #[derive(Serialize, Debug, Clone, Default)]
 #[pyclass]
@@ -33,7 +34,7 @@ pub struct PiranhaOutputSummary {
 }
 
 impl PiranhaOutputSummary {
-  pub(crate) fn new(source_code_unit: &SourceCodeUnit) -> PiranhaOutputSummary {
+  pub fn new(source_code_unit: &SourceCodeUnit) -> PiranhaOutputSummary {
     return PiranhaOutputSummary {
       path: String::from(source_code_unit.path().as_os_str().to_str().unwrap()),
       content: source_code_unit.code().to_string(),
@@ -42,13 +43,13 @@ impl PiranhaOutputSummary {
     };
   }
 
-  #[cfg(test)]
-  pub(crate) fn matches(&self) -> &[(String, Match)] {
+  // #[cfg(test)]
+  pub fn matches(&self) -> &[(String, Match)] {
     self.matches.as_ref()
   }
 
-  #[cfg(test)]
-  pub(crate) fn rewrites(&self) -> &[Edit] {
+  // #[cfg(test)]
+  pub fn rewrites(&self) -> &[Edit] {
     self.rewrites.as_ref()
   }
 

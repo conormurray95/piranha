@@ -16,14 +16,15 @@ use std::collections::HashMap;
 use serde_derive::Deserialize;
 use tree_sitter::Node;
 
-use crate::utilities::tree_sitter_utilities::{
-  get_node_for_range, substitute_tags, PiranhaHelpers,
+// use tree_sitter_utils;
+use tree_sitter_utils::{
+  get_node_for_range, substitute_tags, TreeSitterQueryHelpers,
 };
 
 use super::{rule_store::RuleStore, source_code_unit::SourceCodeUnit};
 
 #[derive(Deserialize, Debug, Clone, Hash, PartialEq, Eq)]
-pub(crate) struct Constraint {
+pub struct Constraint {
   /// Scope in which the constraint query has to be applied
   matcher: String,
   /// The Tree-sitter queries that need to be applied in the `matcher` scope
@@ -31,11 +32,11 @@ pub(crate) struct Constraint {
 }
 
 impl Constraint {
-  pub(crate) fn queries(&self) -> &[String] {
+  pub fn queries(&self) -> &[String] {
     &self.queries
   }
 
-  pub(crate) fn matcher(&self, substitutions: &HashMap<String, String>) -> String {
+  pub fn matcher(&self, substitutions: &HashMap<String, String>) -> String {
     substitute_tags(String::from(&self.matcher), substitutions, true)
   }
 
@@ -44,7 +45,7 @@ impl Constraint {
   /// This function traverses the ancestors of the given `node` until `constraint.matcher` matches
   /// i.e. finds scope for constraint.
   /// Within this scope it checks if the `constraint.query` DOES NOT MATCH any sub-tree.
-  pub(crate) fn is_satisfied(
+  pub fn is_satisfied(
     &self, node: Node, source_code_unit: SourceCodeUnit, rule_store: &mut RuleStore,
     substitutions: &HashMap<String, String>,
   ) -> bool {
@@ -88,7 +89,7 @@ impl Constraint {
 
 impl Constraint {
   #[cfg(test)]
-  pub(crate) fn new(matcher: String, queries: Vec<String>) -> Self {
+  pub fn new(matcher: String, queries: Vec<String>) -> Self {
     Self { matcher, queries }
   }
 } 

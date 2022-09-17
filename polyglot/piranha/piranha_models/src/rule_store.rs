@@ -19,19 +19,19 @@ use tree_sitter::{Language, Query};
 
 use crate::{
   config::read_config_files,
-  models::piranha_arguments::PiranhaArguments,
-  models::{
+  piranha_arguments::PiranhaArguments,
+  {
     rule::Rule,
     rule_graph::RuleGraph,
     scopes::{ScopeGenerator, ScopeQueryGenerator},
   },
-  utilities::{tree_sitter_utilities::TreeSitterHelpers, MapOfVec},
 };
+use tree_sitter_utils::{MapOfVec, TreeSitterHelpers};
 
-pub(crate) static GLOBAL: &str = "Global";
-pub(crate) static PARENT: &str = "Parent";
+pub static GLOBAL: &str = "Global";
+pub static PARENT: &str = "Parent";
 /// This maintains the state for Piranha.
-pub(crate) struct RuleStore {
+pub struct RuleStore {
   // A graph that captures the flow amongst the rules
   rule_graph: RuleGraph,
   // Caches the compiled tree-sitter queries.
@@ -49,7 +49,7 @@ pub(crate) struct RuleStore {
 }
 
 impl RuleStore {
-  pub(crate) fn new(args: &PiranhaArguments) -> RuleStore {
+  pub fn new(args: &PiranhaArguments) -> RuleStore {
     let (rules, edges, scopes) = read_config_files(args);
     let rule_graph = RuleGraph::new(&edges, &rules);
     let mut rule_store = RuleStore {
@@ -70,30 +70,30 @@ impl RuleStore {
     rule_store
   }
 
-  pub(crate) fn global_rules(&self) -> Vec<Rule> {
+  pub fn global_rules(&self) -> Vec<Rule> {
     self.global_rules.clone()
   }
 
-  pub(crate) fn language(&self) -> Language {
+  pub fn language(&self) -> Language {
     self.piranha_args.language()
   }
 
-  pub(crate) fn language_name(&self) -> &str {
+  pub fn language_name(&self) -> &str {
     self.piranha_args.language_name()
   }
 
-  pub(crate) fn get_number_of_ancestors_in_parent_scope(&self) -> &u8 {
+  pub fn get_number_of_ancestors_in_parent_scope(&self) -> &u8 {
     self.piranha_args.number_of_ancestors_in_parent_scope()
   }
 
-  pub(crate) fn default_substitutions(&self) -> HashMap<String, String> {
+  pub fn default_substitutions(&self) -> HashMap<String, String> {
     let mut default_subs = self.piranha_args.input_substitutions().clone();
     default_subs.extend(self.global_tags().clone());
     default_subs
   }
 
   /// Add a new global rule, along with grep heuristics (If it doesn't already exist)
-  pub(crate) fn add_to_global_rules(
+  pub fn add_to_global_rules(
     &mut self, rule: &Rule, tag_captures: &HashMap<String, String>,
   ) {
     if let Ok(mut r) = rule.try_instantiate(tag_captures) {
@@ -110,7 +110,7 @@ impl RuleStore {
 
   /// Get the compiled query for the `query_str` from the cache
   /// else compile it, add it to the cache and return it.
-  pub(crate) fn query(&mut self, query_str: &String) -> &Query {
+  pub fn query(&mut self, query_str: &String) -> &Query {
     let language = self.language();
     self
       .rule_query_cache
@@ -119,7 +119,7 @@ impl RuleStore {
   }
 
   /// Get the next rules to be applied grouped by the scope in which they should be performed.
-  pub(crate) fn get_next(
+  pub fn get_next(
     &self, rule_name: &String, tag_matches: &HashMap<String, String>,
   ) -> HashMap<String, Vec<Rule>> {
     // let rule_name = rule.name();
@@ -154,7 +154,7 @@ impl RuleStore {
   }
 
   // For the given scope level, get the ScopeQueryGenerator from the `scope_config.toml` file
-  pub(crate) fn get_scope_query_generators(&self, scope_level: &str) -> Vec<ScopeQueryGenerator> {
+  pub fn get_scope_query_generators(&self, scope_level: &str) -> Vec<ScopeQueryGenerator> {
     self
       .scopes
       .iter()
@@ -163,11 +163,11 @@ impl RuleStore {
       .unwrap_or_else(Vec::new)
   }
 
-  pub(crate) fn global_tags(&self) -> &HashMap<String, String> {
+  pub fn global_tags(&self) -> &HashMap<String, String> {
     &self.global_tags
   }
 
-  pub(crate) fn add_global_tags(&mut self, new_entries: &HashMap<String, String>) {
+  pub fn add_global_tags(&mut self, new_entries: &HashMap<String, String>) {
     let global_substitutions: HashMap<String, String> = new_entries
       .iter()
       .filter(|e| e.0.starts_with(self.piranha_args.global_tag_prefix()))
@@ -176,14 +176,14 @@ impl RuleStore {
     let _ = &self.global_tags.extend(global_substitutions);
   }
 
-  pub(crate) fn piranha_args(&self) -> &PiranhaArguments {
+  pub fn piranha_args(&self) -> &PiranhaArguments {
       &self.piranha_args
   }
 }
 
 #[cfg(test)]
 impl RuleStore {
-  pub(crate) fn dummy() -> RuleStore {
+  pub fn dummy() -> RuleStore {
     RuleStore {
       rule_graph: RuleGraph::dummy(),
       rule_query_cache: HashMap::new(),
@@ -195,7 +195,7 @@ impl RuleStore {
     }
   }
 
-  pub(crate) fn dummy_with_scope(scopes: Vec<ScopeGenerator>) -> RuleStore {
+  pub fn dummy_with_scope(scopes: Vec<ScopeGenerator>) -> RuleStore {
     RuleStore {
       rule_graph: RuleGraph::dummy(),
       rule_query_cache: HashMap::new(),

@@ -1,4 +1,3 @@
-
 /*
 Copyright (c) 2022 Uber Technologies, Inc.
 
@@ -11,51 +10,54 @@ Copyright (c) 2022 Uber Technologies, Inc.
  express or implied. See the License for the specific language governing permissions and
  limitations under the License.
 */
-use std::{
-  collections::{HashMap},
-};
+use std::collections::HashMap;
 
-use tree_sitter::Query;
+use tree_sitter::{Query, Parser};
+
+use super::{substitute_tags, TreeSitterQueryHelpers, TreeSitterHelpers};
 
 
-
-use {
-  super::{get_parser, substitute_tags, PiranhaHelpers, TreeSitterHelpers},
-};
+pub(crate) fn get_parser(language: String) -> Parser {
+    let mut parser = Parser::new();
+    parser
+      .set_language(language.get_language())
+      .expect("Could not set the language for the parser.");
+    parser
+}
 
 #[test]
 fn test_get_all_matches_for_query_positive() {
   let source_code = r#"
-      class Test {
-        void foobar(Experiment exp) {
-          if (exp.isFlagTreated(SOME_FLAG)){
-            //Do Something
-          }
-          // Do something else
-          
-          if (abc && exp.isFlagTreated(SOME_FLAG)){
-            // Do this too!
+        class Test {
+          void foobar(Experiment exp) {
+            if (exp.isFlagTreated(SOME_FLAG)){
+              //Do Something
+            }
+            // Do something else
+            
+            if (abc && exp.isFlagTreated(SOME_FLAG)){
+              // Do this too!
+            }
           }
         }
-      }
-    "#;
+      "#;
   let language_name = String::from("java");
   let query = Query::new(
     language_name.get_language(),
     r#"((
-        (method_invocation 
-          name : (_) @name
-          arguments: ((argument_list 
-                          ([
-                            (field_access field: (_)@argument)
-                            (_) @argument
-                           ])) )
-              
-       ) @method_invocation
-      )
-      (#eq? @name "isFlagTreated")
-      (#eq? @argument "SOME_FLAG")
-      )"#,
+          (method_invocation 
+            name : (_) @name
+            arguments: ((argument_list 
+                            ([
+                              (field_access field: (_)@argument)
+                              (_) @argument
+                             ])) )
+                
+         ) @method_invocation
+        )
+        (#eq? @name "isFlagTreated")
+        (#eq? @argument "SOME_FLAG")
+        )"#,
   )
   .unwrap();
 
@@ -77,36 +79,36 @@ fn test_get_all_matches_for_query_positive() {
 #[test]
 fn test_get_all_matches_for_query_negative() {
   let source_code = r#"
-      class Test {
-        void foobar(Experiment exp) {
-          if (exp.isFlagTreated(SOME_OTHER)){
-            //Do Something
-          }
-          // Do something else
-          
-          if (abc && exp.isFlagTreated(SOME_OTHER)){
-            // Do this too!
+        class Test {
+          void foobar(Experiment exp) {
+            if (exp.isFlagTreated(SOME_OTHER)){
+              //Do Something
+            }
+            // Do something else
+            
+            if (abc && exp.isFlagTreated(SOME_OTHER)){
+              // Do this too!
+            }
           }
         }
-      }
-    "#;
+      "#;
   let language_name = String::from("java");
   let query = Query::new(
     language_name.get_language(),
     r#"((
-        (method_invocation 
-          name : (_) @name
-          arguments: ((argument_list 
-                          ([
-                            (field_access field: (_)@argument)
-                            (_) @argument
-                           ])) )
-              
-       ) @method_invocation
-      )
-      (#eq? @name "isFlagTreated")
-      (#eq? @argument "SOME_FLAG")
-      )"#,
+          (method_invocation 
+            name : (_) @name
+            arguments: ((argument_list 
+                            ([
+                              (field_access field: (_)@argument)
+                              (_) @argument
+                             ])) )
+                
+         ) @method_invocation
+        )
+        (#eq? @name "isFlagTreated")
+        (#eq? @argument "SOME_FLAG")
+        )"#,
   )
   .unwrap();
 

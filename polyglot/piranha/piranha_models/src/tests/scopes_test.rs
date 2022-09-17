@@ -1,3 +1,6 @@
+use tree_sitter_utils::get_parser;
+
+
 /*
 Copyright (c) 2022 Uber Technologies, Inc.
 
@@ -11,14 +14,13 @@ Copyright (c) 2022 Uber Technologies, Inc.
  limitations under the License.
 */
 use {
-  super::{ScopeGenerator, ScopeQueryGenerator},
   crate::{
-    models::{rule_store::RuleStore, source_code_unit::SourceCodeUnit},
-    utilities::eq_without_whitespace,
-    utilities::tree_sitter_utilities::get_parser,
+    scopes::ScopeGenerator, scopes::ScopeQueryGenerator,
+    {rule_store::RuleStore, source_code_unit::SourceCodeUnit},
   },
   std::{collections::HashMap, path::PathBuf},
 };
+use piranha_utilities::eq_without_whitespace;
 
 /// Positive test for the generated scope query, given scope generators, source code and position of pervious edit.
 #[test]

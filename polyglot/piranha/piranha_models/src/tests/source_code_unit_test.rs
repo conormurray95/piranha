@@ -19,17 +19,18 @@ use itertools::Itertools;
 use tempdir::TempDir;
 
 use tree_sitter::Parser;
-
-use crate::models::{piranha_arguments::{PiranhaArguments, PiranhaArgumentsBuilder}, rule::{Rule, SatisfiesConstraint}, constraint::Constraint, rule_store::RuleStore};
+use piranha_utilities::eq_without_whitespace;
+use crate::{source_code_unit::SourceCodeUnit, piranha_arguments::{PiranhaArguments, PiranhaArgumentsBuilder}, rule::{Rule, SatisfiesConstraint}, constraint::Constraint, rule_store::RuleStore};
 use {
-  super::SourceCodeUnit,
   crate::{
-    models::edit::Edit, utilities::eq_without_whitespace,
-    utilities::tree_sitter_utilities::get_parser,
+    edit::Edit, 
+    // SourceCodeUnit
+    // utilities::tree_sitter_utilities::get_parser,
   },
   std::{collections::HashMap, path::PathBuf},
   tree_sitter::Range,
 };
+use tree_sitter_utils::get_parser;
 
 impl SourceCodeUnit {
   pub(crate) fn default(content: &str, parser: &mut Parser, language_name: String) -> Self {

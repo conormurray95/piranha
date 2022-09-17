@@ -12,7 +12,7 @@ Copyright (c) 2022 Uber Technologies, Inc.
  limitations under the License.
 */
 
-use crate::utilities::find_file;
+use crate::find_file;
 use serde_derive::Deserialize;
 use std::path::PathBuf;
 
