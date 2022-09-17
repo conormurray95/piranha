@@ -98,7 +98,7 @@ impl SourceCodeUnit {
     } else {
       let content = if *piranha_arguments.delete_consecutive_new_lines() {
         let regex = Regex::new(r"\n(\s*\n)+(\s*\n)").unwrap();
-        regex.replace_all(&self.code(), "\n${2}").to_string()
+        regex.replace_all(self.code(), "\n${2}").to_string()
       } else {
         self.code().to_string()
       };
@@ -115,18 +115,18 @@ impl SourceCodeUnit {
       true,
     );
     // Check if the edit kind is "DELETE something"
-    if self.piranha_arguments.cleanup_comments().clone() && edit.replacement_string().is_empty() {
+    if *self.piranha_arguments.cleanup_comments() && edit.replacement_string().is_empty() {
       let deleted_at = edit.replacement_range().start_point.row;
       if let Some(comment_range) = self.get_comment_at_line(
         deleted_at,
-        self.piranha_arguments.cleanup_comments_buffer().clone(),
+        *self.piranha_arguments.cleanup_comments_buffer(),
         edit.replacement_range().start_byte,
       ) {
         info!("Deleting an associated comment");
         applied_edit = self._apply_edit(comment_range, "", parser, false);
       }
     }
-    return applied_edit;
+    applied_edit
   }
 
   /// This function reports the range of the comment associated to the deleted element.
@@ -176,7 +176,7 @@ impl SourceCodeUnit {
       // If that's not the case, its okay, because we will not find any comments in these scenarios.
       return self.get_comment_at_line(row - 1, buffer - 1, start_byte);
     }
-    return None;
+    None
   }
 
   /// Applies an edit to the source code unit
@@ -369,7 +369,7 @@ impl SourceCodeUnit {
         // Apply edit_1
         let applied_ts_edit = self.apply_edit(&edit, parser);
 
-        self.propagate(get_replace_range(applied_ts_edit), rule.clone(), rule_store, parser);
+        self.propagate(get_replace_range(applied_ts_edit), rule, rule_store, parser);
       }
     }
     // When rule is a "match-only" rule :
@@ -504,7 +504,7 @@ impl SourceCodeUnit {
       if let Some(p_match) =
         &self
           .root_node()
-          .get_match_for_query(&self.code(), tree_sitter_scope_query, true)
+          .get_match_for_query(self.code(), tree_sitter_scope_query, true)
       {
         return get_node_for_range(
           self.root_node(),
@@ -587,7 +587,7 @@ impl SourceCodeUnit {
       );
 
       if matched_node.is_satisfied(
-        &self,
+        self,
         &rule,
         p_match.matches(),
         rule_store,

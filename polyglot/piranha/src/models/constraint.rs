@@ -59,7 +59,7 @@ impl Constraint {
     while let Some(parent) = current_node.parent() {
       let query_str = &self.matcher(substitutions);
       if let Some(p_match) =
-        parent.get_match_for_query(&source_code_unit.code(), rule_store.query(query_str), false)
+        parent.get_match_for_query(source_code_unit.code(), rule_store.query(query_str), false)
       {
         matched_matcher = true;
         let scope_node = get_node_for_range(
@@ -72,7 +72,7 @@ impl Constraint {
           let query = &rule_store.query(&query_str);
           // If this query matches anywhere within the scope, return false.
           if scope_node
-            .get_match_for_query(&source_code_unit.code(), query, true)
+            .get_match_for_query(source_code_unit.code(), query, true)
             .is_some()
           {
             return false;

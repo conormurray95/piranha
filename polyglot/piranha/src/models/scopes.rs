@@ -66,7 +66,7 @@ impl ScopeGenerator {
     loop {
       for m in &scope_matchers {
         if let Some(p_match) = changed_node.get_match_for_query(
-          &source_code_unit.code(),
+          source_code_unit.code(),
           rules_store.query(&m.matcher()),
           false,
         ) {

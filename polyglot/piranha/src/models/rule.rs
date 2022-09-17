@@ -18,12 +18,12 @@ use serde_derive::Deserialize;
 use tree_sitter::Node;
 
 use crate::utilities::{
-  tree_sitter_utilities::{get_context, get_node_for_range, substitute_tags, PiranhaHelpers},
+  tree_sitter_utilities::{substitute_tags},
   MapOfVec,
 };
 
 use super::{
-  constraint::Constraint, edit::Edit, matches::Match, rule_store::RuleStore,
+  constraint::Constraint, rule_store::RuleStore,
   source_code_unit::SourceCodeUnit,
 };
 

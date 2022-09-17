@@ -85,7 +85,7 @@ fn test_apply_edit_positive() {
   );
   assert!(eq_without_whitespace(
     &source_code.replace("boolean isFlagTreated = true;", ""),
-    &source_code_unit.code()
+    source_code_unit.code()
   ));
 }
 
@@ -135,7 +135,7 @@ fn test_apply_edit_comma_handling_via_grammar() {
   );
   assert!(eq_without_whitespace(
     &source_code.replace("\"NullAway\",", ""),
-    &source_code_unit.code()
+    source_code_unit.code()
   ));
 }
 
@@ -164,7 +164,7 @@ fn test_apply_edit_comma_handling_via_regex() {
   );
   assert!(eq_without_whitespace(
     &source_code.replace("name: \"BMX Bike\",", ""),
-    &source_code_unit.code()
+    source_code_unit.code()
   ));
 }
 fn execute_persist_in_temp_folder(
@@ -345,7 +345,7 @@ fn test_get_edit_positive_recursive() {
   let matches = source_code_unit.get_matches(rule.clone(), &mut rule_store, node, true);
   assert!(!matches.is_empty());
 
-  let edit = source_code_unit.get_edit(rule.clone(), &mut rule_store, node, true);
+  let edit = source_code_unit.get_edit(rule, &mut rule_store, node, true);
   assert!(edit.is_some());
 }
 
@@ -391,7 +391,7 @@ fn test_get_edit_negative_recursive() {
   let node = source_code_unit.root_node();
   let matches = source_code_unit.get_matches(rule.clone(), &mut rule_store, node, true);
   assert!(matches.is_empty());
-  let edit = source_code_unit.get_edit(rule.clone(), &mut rule_store, node, true);
+  let edit = source_code_unit.get_edit(rule, &mut rule_store, node, true);
   assert!(edit.is_none());
 }
 

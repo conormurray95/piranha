@@ -12,19 +12,15 @@ Copyright (c) 2022 Uber Technologies, Inc.
  limitations under the License.
 */
 use std::{
-  collections::{HashMap, HashSet},
-  path::PathBuf,
+  collections::{HashMap},
 };
 
 use tree_sitter::Query;
 
-use crate::models::piranha_arguments::{PiranhaArgumentsBuilder};
+
 
 use {
   super::{get_parser, substitute_tags, PiranhaHelpers, TreeSitterHelpers},
-  crate::models::{
-    constraint::Constraint, rule::Rule, rule_store::RuleStore, source_code_unit::SourceCodeUnit,
-  },
 };
 
 #[test]
