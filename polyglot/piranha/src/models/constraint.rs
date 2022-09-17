@@ -91,4 +91,5 @@ impl Constraint {
   pub(crate) fn new(matcher: String, queries: Vec<String>) -> Self {
     Self { matcher, queries }
   }
-}
+} 
+
