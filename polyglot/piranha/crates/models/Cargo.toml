@@ -22,6 +22,7 @@ cc = "1.0.73"
 [dependencies]
 piranha_utilities = { path = "../piranha_utilities" }
 tree_sitter_wrapper = { path = "../tree_sitter_wrapper" }
+dsl = { path = "../dsl" }
 
 tree-sitter = "0.20.6"
 tree-sitter-traversal = "0.1.2"

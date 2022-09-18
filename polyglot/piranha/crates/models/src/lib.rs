@@ -11,18 +11,14 @@ Copyright (c) 2022 Uber Technologies, Inc.
  limitations under the License.
 */
 
-pub mod constraint;
 pub mod edit;
 // pub mod matches;
-
-pub mod outgoing_edges;
 pub mod piranha_arguments;
 pub mod piranha_config;
 pub mod piranha_output;
-pub mod rule;
-pub mod rule_graph;
+
 pub mod rule_store;
-pub mod scopes;
+
 pub mod source_code_unit;
 pub mod config;
 #[cfg(test)]

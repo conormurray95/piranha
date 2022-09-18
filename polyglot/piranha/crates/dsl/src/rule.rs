@@ -19,8 +19,7 @@ use tree_sitter::Node;
 
 use tree_sitter_wrapper::{substitute_tags, MapOfVec};
 use super::{
-  constraint::Constraint, rule_store::RuleStore,
-  source_code_unit::SourceCodeUnit,
+  constraint::Constraint,
 };
 
 static SEED: &str = "Seed Rule";
@@ -223,7 +222,7 @@ impl Rule {
   }
 }
 
-#[cfg(test)]
+// #[cfg(test)]
 impl Rule {
   pub fn new(
     name: &str, query: &str, replace_node: &str, replace: &str, holes: HashSet<String>,
@@ -246,32 +245,6 @@ impl Rule {
   }
 }
 
-#[rustfmt::skip]
-pub trait SatisfiesConstraint {
-    // / Checks if the given rule satisfies the constraint of the rule, under the substitutions obtained upon matching `rule.query`
-    fn is_satisfied(&self, source_code_unit: &SourceCodeUnit, rule: &Rule, substitutions: &HashMap<String, String>,rule_store: &mut RuleStore,) -> bool ;
-}
-
-impl SatisfiesConstraint for Node<'_> {
-fn is_satisfied(
-  &self, source_code_unit: &SourceCodeUnit, rule: &Rule, substitutions: &HashMap<String, String>,
-  rule_store: &mut RuleStore,
-) -> bool {
-  let updated_substitutions = &substitutions
-    .clone()
-    .into_iter()
-    .chain(rule_store.default_substitutions())
-    .collect();
-  rule.constraints().iter().all(|constraint| {
-    constraint.is_satisfied(
-      *self,
-      source_code_unit.clone(),
-      rule_store,
-      updated_substitutions,
-    )
-  })
-}
-} 
 
 // #[cfg(test)]
 // #[path = "unit_tests/rule_test.rs"]

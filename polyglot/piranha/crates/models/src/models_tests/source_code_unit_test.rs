@@ -19,12 +19,15 @@ use std::{
 use itertools::Itertools;
 use tempdir::TempDir;
 
+use dsl :: {constraint::Constraint,
+  rule::{Rule}};
+
 use crate::{
-  constraint::Constraint,
+  
   piranha_arguments::{PiranhaArguments, PiranhaArgumentsBuilder},
-  rule::{Rule, SatisfiesConstraint},
+  
   rule_store::RuleStore,
-  source_code_unit::SourceCodeUnit,
+  source_code_unit::{SourceCodeUnit, SatisfiesConstraint},
   edit::Edit
 };
 use piranha_utilities::eq_without_whitespace;

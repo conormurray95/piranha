@@ -16,15 +16,13 @@ use std::collections::HashMap;
 use colored::Colorize;
 use log::info;
 use tree_sitter::{Language, Query};
-
+use dsl::{rule::Rule,
+  rule_graph::RuleGraph,
+  scopes::{ScopeGenerator, ScopeQueryGenerator}};
+  
 use crate::{
   config::read_config_files,
   piranha_arguments::PiranhaArguments,
-  {
-    rule::Rule,
-    rule_graph::RuleGraph,
-    scopes::{ScopeGenerator, ScopeQueryGenerator},
-  },
 };
 use tree_sitter_wrapper::{MapOfVec, TreeSitterHelpers};
 
