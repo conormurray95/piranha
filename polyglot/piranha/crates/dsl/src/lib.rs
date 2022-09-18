@@ -3,3 +3,6 @@ pub mod scopes;
 pub mod rule;
 pub mod rule_graph;
 pub mod outgoing_edges;
+
+#[cfg(test)]
+mod dsl_tests;

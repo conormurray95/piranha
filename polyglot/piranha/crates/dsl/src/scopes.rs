@@ -67,25 +67,20 @@ impl ScopeQueryGenerator {
   }
 }
 
-#[cfg(test)]
 impl ScopeQueryGenerator {
-  pub(crate) fn new(matcher: &str, generator: &str) -> ScopeQueryGenerator {
+  pub fn new(matcher: &str, generator: &str) -> ScopeQueryGenerator {
     ScopeQueryGenerator {
       matcher: matcher.to_string(),
       generator: generator.to_string(),
     }
   }
 }
-#[cfg(test)]
+
 impl ScopeGenerator {
-  pub(crate) fn new(name: &str, rules: Vec<ScopeQueryGenerator>) -> ScopeGenerator {
+  pub fn new(name: &str, rules: Vec<ScopeQueryGenerator>) -> ScopeGenerator {
     ScopeGenerator {
       name: name.to_string(),
       rules,
     }
   }
 }
-
-// #[cfg(test)]
-// #[path = "unit_tests/scopes_test.rs"]
-// mod scopes_test;
