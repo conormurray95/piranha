@@ -19,7 +19,7 @@ pub mod piranha_output;
 
 pub mod rule_store;
 
-pub mod source_code_unit;
 pub mod config;
 #[cfg(test)]
 mod models_tests;
+pub mod source_code_unit;

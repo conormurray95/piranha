@@ -14,16 +14,15 @@ Copyright (c) 2022 Uber Technologies, Inc.
 use std::collections::HashMap;
 
 use colored::Colorize;
+use dsl::{
+  rule::Rule,
+  rule_graph::RuleGraph,
+  scopes::{ScopeGenerator, ScopeQueryGenerator},
+};
 use log::info;
 use tree_sitter::{Language, Query};
-use dsl::{rule::Rule,
-  rule_graph::RuleGraph,
-  scopes::{ScopeGenerator, ScopeQueryGenerator}};
-  
-use crate::{
-  config::read_config_files,
-  piranha_arguments::PiranhaArguments,
-};
+
+use crate::{config::read_config_files, piranha_arguments::PiranhaArguments};
 use tree_sitter_wrapper::{MapOfVec, TreeSitterHelpers};
 
 pub static GLOBAL: &str = "Global";
@@ -91,9 +90,7 @@ impl RuleStore {
   }
 
   /// Add a new global rule, along with grep heuristics (If it doesn't already exist)
-  pub fn add_to_global_rules(
-    &mut self, rule: &Rule, tag_captures: &HashMap<String, String>,
-  ) {
+  pub fn add_to_global_rules(&mut self, rule: &Rule, tag_captures: &HashMap<String, String>) {
     if let Ok(mut r) = rule.try_instantiate(tag_captures) {
       if !self.global_rules.iter().any(|r| {
         r.name().eq(&rule.name()) && r.replace().eq(&rule.replace()) && r.query().eq(&rule.query())
@@ -175,7 +172,7 @@ impl RuleStore {
   }
 
   pub fn piranha_args(&self) -> &PiranhaArguments {
-      &self.piranha_args
+    &self.piranha_args
   }
 }
 

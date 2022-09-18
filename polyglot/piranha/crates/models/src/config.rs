@@ -17,9 +17,9 @@ Copyright (c) 2022 Uber Technologies, Inc.
 
 use crate::piranha_arguments::PiranhaArguments;
 use dsl::{
-    outgoing_edges::{Edges, OutgoingEdges},
-    rule::{Rule, Rules},
-    scopes::{ScopeConfig, ScopeGenerator},
+  outgoing_edges::{Edges, OutgoingEdges},
+  rule::{Rule, Rules},
+  scopes::{ScopeConfig, ScopeGenerator},
 };
 use piranha_utilities::read_toml;
 

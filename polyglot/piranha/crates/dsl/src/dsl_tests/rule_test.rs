@@ -12,17 +12,7 @@ Copyright (c) 2022 Uber Technologies, Inc.
 */
 use std::collections::HashSet;
 
-
-use {
-  crate::{
-    {rule::Rule, constraint::Constraint, },
-    // utilities::tree_sitter_wrapper::get_parser,
-
-  },
-  std::collections::HashMap,
-  std::path::PathBuf,
-};
-use tree_sitter_wrapper::get_parser;
+use {crate::rule::Rule, std::collections::HashMap};
 
 /// Tests whether a valid rule can be correctly instantiated given valid substitutions.
 #[test]

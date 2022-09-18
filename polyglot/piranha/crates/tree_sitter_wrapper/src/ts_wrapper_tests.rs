@@ -12,17 +12,16 @@ Copyright (c) 2022 Uber Technologies, Inc.
 */
 use std::collections::HashMap;
 
-use tree_sitter::{Query, Parser};
+use tree_sitter::{Parser, Query};
 
-use super::{substitute_tags, TreeSitterQueryHelpers, TreeSitterHelpers};
-
+use super::{substitute_tags, TreeSitterHelpers, TreeSitterQueryHelpers};
 
 pub(crate) fn get_parser(language: String) -> Parser {
-    let mut parser = Parser::new();
-    parser
-      .set_language(language.get_language())
-      .expect("Could not set the language for the parser.");
-    parser
+  let mut parser = Parser::new();
+  parser
+    .set_language(language.get_language())
+    .expect("Could not set the language for the parser.");
+  parser
 }
 
 #[test]

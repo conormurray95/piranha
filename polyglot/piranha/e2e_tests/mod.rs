@@ -13,10 +13,10 @@ Copyright (c) 2022 Uber Technologies, Inc.
 
 use std::path::{Path, PathBuf};
 
-use log::error;
-use models::{config::CommandLineArguments, piranha_arguments::PiranhaArguments};
 use crate::execute_piranha;
+use log::error;
 use models::piranha_output::PiranhaOutputSummary;
+use models::{config::CommandLineArguments, piranha_arguments::PiranhaArguments};
 use piranha_utilities::{eq_without_whitespace, find_file, read_file};
 
 mod test_piranha_java;

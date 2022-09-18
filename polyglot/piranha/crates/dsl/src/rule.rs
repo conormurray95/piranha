@@ -15,12 +15,9 @@ use std::collections::{HashMap, HashSet};
 
 use colored::Colorize;
 use serde_derive::Deserialize;
-use tree_sitter::Node;
 
+use super::constraint::Constraint;
 use tree_sitter_wrapper::{substitute_tags, MapOfVec};
-use super::{
-  constraint::Constraint,
-};
 
 static SEED: &str = "Seed Rule";
 static CLEAN_UP: &str = "Cleanup Rule";
@@ -77,9 +74,7 @@ impl Rule {
 
   /// Tries to instantiate the rule (`self`) based on the substitutions.
   /// Note this could fail if the `substitutions` doesn't contain mappings for each hole.
-  pub fn try_instantiate(
-    &self, substitutions: &HashMap<String, String>,
-  ) -> Result<Rule, String> {
+  pub fn try_instantiate(&self, substitutions: &HashMap<String, String>) -> Result<Rule, String> {
     let relevant_substitutions = self
       .holes()
       .iter()
@@ -108,9 +103,7 @@ impl Rule {
 
   /// Groups the rules based on the field `rule.groups`
   /// Note: a rule can belong to more than one group.
-  pub fn group_rules(
-    rules: &Vec<Rule>,
-  ) -> (HashMap<String, Rule>, HashMap<String, Vec<String>>) {
+  pub fn group_rules(rules: &Vec<Rule>) -> (HashMap<String, Rule>, HashMap<String, Vec<String>>) {
     let mut rules_by_name = HashMap::new();
     let mut rules_by_group = HashMap::new();
     for rule in rules {
@@ -124,9 +117,7 @@ impl Rule {
 
   /// Records the string that should be grepped in order to find files that
   /// potentially could match this global rule.
-  pub fn add_grep_heuristics_for_global_rules(
-    &mut self, substitutions: &HashMap<String, String>,
-  ) {
+  pub fn add_grep_heuristics_for_global_rules(&mut self, substitutions: &HashMap<String, String>) {
     let mut gh = HashSet::new();
     for hole in self.holes() {
       if let Some(x) = substitutions.get(&hole) {
@@ -210,9 +201,6 @@ impl Rule {
     String::from(&self.name)
   }
 
-
-  
-
   pub fn set_replace(&mut self, replace: String) {
     self.replace = Some(replace);
   }
@@ -244,7 +232,6 @@ impl Rule {
     }
   }
 }
-
 
 // #[cfg(test)]
 // #[path = "unit_tests/rule_test.rs"]

@@ -15,8 +15,8 @@ Copyright (c) 2022 Uber Technologies, Inc.
 use std::{fs, time::Instant};
 
 use log::info;
-use polyglot_piranha::execute_piranha;
 use models::{piranha_arguments::PiranhaArguments, piranha_output::PiranhaOutputSummary};
+use polyglot_piranha::execute_piranha;
 
 fn main() {
   let now = Instant::now();

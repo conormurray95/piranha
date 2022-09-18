@@ -1,4 +1,3 @@
-
 /*
 Copyright (c) 2022 Uber Technologies, Inc.
 
@@ -17,9 +16,9 @@ use std::path::PathBuf;
 use itertools::Itertools;
 use serde_derive::Serialize;
 
-use tree_sitter_wrapper::matches::Match;
 use super::{edit::Edit, source_code_unit::SourceCodeUnit};
 use pyo3::prelude::pyclass;
+use tree_sitter_wrapper::matches::Match;
 #[derive(Serialize, Debug, Clone, Default)]
 #[pyclass]
 pub struct PiranhaOutputSummary {

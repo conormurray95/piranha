@@ -14,13 +14,9 @@ Copyright (c) 2022 Uber Technologies, Inc.
 use std::collections::HashMap;
 
 use serde_derive::Deserialize;
-use tree_sitter::Node;
 
 // use tree_sitter_wrapper;
-use tree_sitter_wrapper::{
-  get_node_for_range, substitute_tags, TreeSitterQueryHelpers,
-};
-
+use tree_sitter_wrapper::substitute_tags;
 
 #[derive(Deserialize, Debug, Clone, Hash, PartialEq, Eq)]
 pub struct Constraint {
@@ -38,7 +34,6 @@ impl Constraint {
   pub fn matcher(&self, substitutions: &HashMap<String, String>) -> String {
     substitute_tags(String::from(&self.matcher), substitutions, true)
   }
-
 }
 
 impl Constraint {
@@ -46,5 +41,4 @@ impl Constraint {
   pub fn new(matcher: String, queries: Vec<String>) -> Self {
     Self { matcher, queries }
   }
-} 
-
+}

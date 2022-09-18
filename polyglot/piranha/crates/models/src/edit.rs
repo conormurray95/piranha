@@ -17,8 +17,8 @@ use getset::{CopyGetters, Getters};
 use serde_derive::Serialize;
 use tree_sitter::Range;
 
-use tree_sitter_wrapper::matches::Match;
 use pyo3::prelude::pyclass;
+use tree_sitter_wrapper::matches::Match;
 
 #[derive(Serialize, Debug, Clone, Getters, CopyGetters)]
 #[pyclass]

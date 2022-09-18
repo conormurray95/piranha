@@ -12,21 +12,20 @@ Copyright (c) 2022 Uber Technologies, Inc.
 */
 
 use models::{
-  piranha_arguments::PiranhaArguments, piranha_output::PiranhaOutputSummary,
-  source_code_unit::SourceCodeUnit,
-  config::CommandLineArguments
+  config::CommandLineArguments, piranha_arguments::PiranhaArguments,
+  piranha_output::PiranhaOutputSummary, source_code_unit::SourceCodeUnit,
 };
 
-use std::{collections::HashMap, path::PathBuf};
 use colored::Colorize;
 use itertools::Itertools;
 use jwalk::WalkDir;
 use log::info;
-use regex::Regex;
-use tree_sitter::Parser;
 use models::rule_store::RuleStore;
 use piranha_utilities::read_file;
 use pyo3::prelude::{pyfunction, pymodule, wrap_pyfunction, PyModule, PyResult, Python};
+use regex::Regex;
+use std::{collections::HashMap, path::PathBuf};
+use tree_sitter::Parser;
 
 #[cfg(test)]
 #[path = "../../../e2e_tests/mod.rs"]

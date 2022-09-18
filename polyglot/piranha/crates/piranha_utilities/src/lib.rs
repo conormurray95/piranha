@@ -23,7 +23,6 @@ use std::path::PathBuf;
 #[cfg(test)]
 mod utils_tests;
 
-
 // Reads a file.
 pub fn read_file(file_path: &PathBuf) -> Result<String, String> {
   File::open(&file_path)

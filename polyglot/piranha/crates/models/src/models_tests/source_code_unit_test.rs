@@ -19,16 +19,13 @@ use std::{
 use itertools::Itertools;
 use tempdir::TempDir;
 
-use dsl :: {constraint::Constraint,
-  rule::{Rule}};
+use dsl::{constraint::Constraint, rule::Rule};
 
 use crate::{
-  
+  edit::Edit,
   piranha_arguments::{PiranhaArguments, PiranhaArgumentsBuilder},
-  
   rule_store::RuleStore,
-  source_code_unit::{SourceCodeUnit, SatisfiesConstraint},
-  edit::Edit
+  source_code_unit::{SatisfiesConstraint, SourceCodeUnit},
 };
 use piranha_utilities::eq_without_whitespace;
 use tree_sitter::Parser;
@@ -563,7 +560,6 @@ fn test_satisfies_constraints_negative() {
   ));
 }
 
-
 #[test]
 fn test_satisfies_constraints_positive() {
   let rule = Rule::new(
@@ -603,13 +599,16 @@ fn test_satisfies_constraints_positive() {
   let mut rule_store = RuleStore::dummy();
   let language_name = String::from("java");
   let mut parser = get_parser(language_name.to_string());
-  let piranha_args = PiranhaArgumentsBuilder::default().language_name(language_name).build().unwrap();
+  let piranha_args = PiranhaArgumentsBuilder::default()
+    .language_name(language_name)
+    .build()
+    .unwrap();
   let source_code_unit = SourceCodeUnit::new(
     &mut parser,
     source_code.to_string(),
     &HashMap::new(),
     PathBuf::new().as_path(),
-    &piranha_args
+    &piranha_args,
   );
 
   let node = &source_code_unit

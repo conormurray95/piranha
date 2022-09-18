@@ -11,11 +11,9 @@ Copyright (c) 2022 Uber Technologies, Inc.
  limitations under the License.
 */
 
-use crate::{
-  {outgoing_edges::OutgoingEdges, rule::Rule},
-};
-use tree_sitter_wrapper::MapOfVec;
+use crate::{outgoing_edges::OutgoingEdges, rule::Rule};
 use std::collections::HashMap;
+use tree_sitter_wrapper::MapOfVec;
 
 pub struct RuleGraph(HashMap<String, Vec<(String, String)>>);
 

@@ -1,4 +1,3 @@
-
 /*
 Copyright (c) 2022 Uber Technologies, Inc.
 
@@ -45,8 +44,7 @@ fn test_read_toml() {
 #[test]
 fn test_read_toml_default() {
   let project_root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-  let path_to_test_file =
-    project_root.join("test-resources/utility_tests/another_sample.toml");
+  let path_to_test_file = project_root.join("test-resources/utility_tests/another_sample.toml");
   let result: TestStruct = read_toml(&path_to_test_file, true);
   assert!(result.name.eq(""));
 }

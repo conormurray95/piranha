@@ -14,12 +14,6 @@ Copyright (c) 2022 Uber Technologies, Inc.
 use itertools::Itertools;
 use serde_derive::Deserialize;
 
-use tree_sitter_wrapper::{
-  get_node_for_range, substitute_tags, TreeSitterQueryHelpers,
-};
-
-
-
 // Represents the content in the `scope_config.toml` file
 #[derive(Deserialize, Debug, Clone, Hash, PartialEq, Eq, Default)]
 pub struct ScopeConfig {

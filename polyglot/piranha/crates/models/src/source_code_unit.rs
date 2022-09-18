@@ -17,31 +17,25 @@ use std::{
 };
 
 use colored::Colorize;
-use dsl::{constraint::Constraint, scopes::ScopeQueryGenerator};
+use dsl::constraint::Constraint;
 use log::info;
 use regex::Regex;
 use tree_sitter::{InputEdit, Node, Parser, Range, Tree};
 use tree_sitter_traversal::{traverse, Order};
 
-use piranha_utilities::{
-  eq_without_whitespace,
-  // tree_sitter_wrapper::{get_replace_range, get_tree_sitter_edit, TreeSitterHelpers, get_context, substitute_tags},
-};
-use tree_sitter_wrapper::{get_replace_range, get_tree_sitter_edit,get_node_for_range, TreeSitterHelpers, get_context, substitute_tags, TreeSitterQueryHelpers, get_parser};
+use crate::{edit::Edit, piranha_arguments::PiranhaArguments, rule_store::RuleStore};
+use dsl::rule::Rule;
+use piranha_utilities::eq_without_whitespace;
 use tree_sitter_wrapper::matches::Match;
-use crate::{ 
-  edit::Edit, piranha_arguments::PiranhaArguments,
-  rule_store::RuleStore
+use tree_sitter_wrapper::{
+  get_context, get_node_for_range, get_replace_range, get_tree_sitter_edit, substitute_tags,
+  TreeSitterHelpers, TreeSitterQueryHelpers,
 };
-use dsl::{rule::Rule,};
 
 use getset::{CopyGetters, Getters};
-use dsl::scopes::ScopeGenerator;
+
 // use crate::utilities::tree_sitter_wrapper::PiranhaHelpers;
-use crate::{
-  rule_store::{GLOBAL, PARENT},
-  // utilities::tree_sitter_wrapper::get_node_for_range,
-};
+use crate::rule_store::{GLOBAL, PARENT};
 
 // Maintains the updated source code content and AST of the file
 #[derive(Clone, Getters, CopyGetters)]
@@ -530,17 +524,13 @@ impl SourceCodeUnit {
 
   // Apply all the `rules` to the node, parent, grand parent and great grand parent.
   // Short-circuit on the first match.
-  pub fn get_edit_for_context(&self,
-    previous_edit_start: usize, previous_edit_end: usize,
-    rules_store: &mut RuleStore, rules: &Vec<Rule>,
+  pub fn get_edit_for_context(
+    &self, previous_edit_start: usize, previous_edit_end: usize, rules_store: &mut RuleStore,
+    rules: &Vec<Rule>,
   ) -> Option<Edit> {
-    let number_of_ancestors_in_parent_scope = *rules_store
-      .get_number_of_ancestors_in_parent_scope();
-    let changed_node = get_node_for_range(
-      self.root_node(),
-      previous_edit_start,
-      previous_edit_end,
-    );
+    let number_of_ancestors_in_parent_scope =
+      *rules_store.get_number_of_ancestors_in_parent_scope();
+    let changed_node = get_node_for_range(self.root_node(), previous_edit_start, previous_edit_end);
     // Context contains -  the changed node in the previous edit, its's parent, grand parent and great grand parent
     let context = || {
       get_context(
@@ -552,8 +542,7 @@ impl SourceCodeUnit {
     };
     for rule in rules {
       for ancestor in &context() {
-        if let Some(edit) = self.get_edit(rule.clone(), rules_store, *ancestor, false)
-        {
+        if let Some(edit) = self.get_edit(rule.clone(), rules_store, *ancestor, false) {
           return Some(edit);
         }
       }
@@ -563,8 +552,7 @@ impl SourceCodeUnit {
 
   /// Gets the first match for the rule in `self`
   pub fn get_matches(
-    &self, rule: Rule, rule_store: &mut RuleStore, node: Node,
-    recursive: bool,
+    &self, rule: Rule, rule_store: &mut RuleStore, node: Node, recursive: bool,
   ) -> Vec<Match> {
     let mut output: Vec<Match> = vec![];
     // Get all matches for the query in the given scope `node`.
@@ -588,12 +576,7 @@ impl SourceCodeUnit {
         p_match.range().end_byte,
       );
 
-      if matched_node.is_satisfied(
-        self,
-        &rule,
-        p_match.matches(),
-        rule_store,
-      ) {
+      if matched_node.is_satisfied(self, &rule, p_match.matches(), rule_store) {
         output.push(p_match);
       }
     }
@@ -602,8 +585,7 @@ impl SourceCodeUnit {
 
   /// Gets the first match for the rule in `self`
   pub fn get_edit(
-    &self, rule: Rule, rule_store: &mut RuleStore, node: Node,
-    recursive: bool,
+    &self, rule: Rule, rule_store: &mut RuleStore, node: Node, recursive: bool,
   ) -> Option<Edit> {
     // Get all matches for the query in the given scope `node`.
 
@@ -615,7 +597,6 @@ impl SourceCodeUnit {
         Edit::new(p_match.clone(), replacement, rule.name())
       });
   }
-
 
   /// Checks if the node satisfies the constraints.
   /// Constraint has two parts (i) `constraint.matcher` (ii) `constraint.query`.
@@ -666,8 +647,7 @@ impl SourceCodeUnit {
   /// Generate a tree-sitter based query representing the scope of the previous edit.
   /// We generate these scope queries by matching the rules provided in `<lang>_scopes.toml`.
   pub fn get_scope_query(
-    &self, scope_level: &str, start_byte: usize, end_byte: usize,
-    rules_store: &mut RuleStore,
+    &self, scope_level: &str, start_byte: usize, end_byte: usize, rules_store: &mut RuleStore,
   ) -> String {
     let root_node = self.root_node();
     let mut changed_node = get_node_for_range(root_node, start_byte, end_byte);
@@ -678,11 +658,9 @@ impl SourceCodeUnit {
     // Match the `scope_matcher.matcher` to the parent
     loop {
       for m in &scope_matchers {
-        if let Some(p_match) = changed_node.get_match_for_query(
-          self.code(),
-          rules_store.query(&m.matcher()),
-          false,
-        ) {
+        if let Some(p_match) =
+          changed_node.get_match_for_query(self.code(), rules_store.query(&m.matcher()), false)
+        {
           // Generate the scope query for the specific context by substituting the
           // the tags with code snippets appropriately in the `generator` query.
           return substitute_tags(m.generator(), p_match.matches(), true);
@@ -696,36 +674,31 @@ impl SourceCodeUnit {
     }
     panic!("Could not create scope query for {:?}", scope_level);
   }
-  
 }
-
 
 pub trait SatisfiesConstraint {
   // / Checks if the given rule satisfies the constraint of the rule, under the substitutions obtained upon matching `rule.query`
-  fn is_satisfied(&self, source_code_unit: &SourceCodeUnit, rule: &Rule, substitutions: &HashMap<String, String>,rule_store: &mut RuleStore,) -> bool ;
+  fn is_satisfied(
+    &self, source_code_unit: &SourceCodeUnit, rule: &Rule, substitutions: &HashMap<String, String>,
+    rule_store: &mut RuleStore,
+  ) -> bool;
 }
 
 impl SatisfiesConstraint for Node<'_> {
-fn is_satisfied(
-&self, source_code_unit: &SourceCodeUnit, rule: &Rule, substitutions: &HashMap<String, String>,
-rule_store: &mut RuleStore,
-) -> bool {
-let updated_substitutions = &substitutions
-  .clone()
-  .into_iter()
-  .chain(rule_store.default_substitutions())
-  .collect();
-rule.constraints().iter().all(|constraint| {
-  source_code_unit.is_satisfied(
-    *self,
-    constraint.clone(),
-    rule_store,
-    updated_substitutions,
-  )
-})
+  fn is_satisfied(
+    &self, source_code_unit: &SourceCodeUnit, rule: &Rule, substitutions: &HashMap<String, String>,
+    rule_store: &mut RuleStore,
+  ) -> bool {
+    let updated_substitutions = &substitutions
+      .clone()
+      .into_iter()
+      .chain(rule_store.default_substitutions())
+      .collect();
+    rule.constraints().iter().all(|constraint| {
+      source_code_unit.is_satisfied(*self, constraint.clone(), rule_store, updated_substitutions)
+    })
+  }
 }
-}
-
 
 /// Positive test for the generated scope query, given scope generators, source code and position of pervious edit.
 #[test]
@@ -783,15 +756,10 @@ fn test_get_scope_query_positive() {
     source_code.to_string(),
     &HashMap::new(),
     PathBuf::new().as_path(),
-    rule_store.piranha_args()
+    rule_store.piranha_args(),
   );
 
-  let scope_query_method = source_code_unit.get_scope_query(
-    "Method",
-    133,
-    134,
-    &mut rule_store,
-  );
+  let scope_query_method = source_code_unit.get_scope_query("Method", 133, 134, &mut rule_store);
 
   assert!(eq_without_whitespace(
     scope_query_method.as_str(),
@@ -808,8 +776,7 @@ fn test_get_scope_query_positive() {
             )"
   ));
 
-  let scope_query_class =
-  source_code_unit.get_scope_query( "Class", 133, 134, &mut rule_store);
+  let scope_query_class = source_code_unit.get_scope_query("Class", 133, 134, &mut rule_store);
   assert!(eq_without_whitespace(
     scope_query_class.as_str(),
     "(
@@ -876,13 +843,11 @@ fn test_get_scope_query_negative() {
     source_code.to_string(),
     &HashMap::new(),
     PathBuf::new().as_path(),
-    rule_store.piranha_args()
+    rule_store.piranha_args(),
   );
 
-  let _ = source_code_unit.get_scope_query( "Method", 133, 134, &mut rule_store);
+  let _ = source_code_unit.get_scope_query("Method", 133, 134, &mut rule_store);
 }
-
- 
 
 // #[cfg(test)]
 // #[path = "unit_tests/source_code_unit_test.rs"]

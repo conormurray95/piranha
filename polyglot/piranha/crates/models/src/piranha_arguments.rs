@@ -11,19 +11,16 @@ Copyright (c) 2022 Uber Technologies, Inc.
  limitations under the License.
 */
 
+use crate::{config::CommandLineArguments, piranha_config::PiranhaConfiguration};
 use clap::Parser;
 use colored::Colorize;
 use derive_builder::Builder;
 use getset::{CopyGetters, Getters};
 use log::info;
+use piranha_utilities::read_toml;
 use std::{collections::HashMap, path::PathBuf};
 use tree_sitter::Language;
-use crate::{
-  config::CommandLineArguments,
-  piranha_config::PiranhaConfiguration,
-};
-use piranha_utilities::{read_toml};
-use tree_sitter_wrapper::{TreeSitterHelpers};
+use tree_sitter_wrapper::TreeSitterHelpers;
 
 #[derive(Clone, Builder, Getters, CopyGetters)]
 #[builder(default)]
@@ -65,13 +62,12 @@ pub struct PiranhaArguments {
   /// parent scoped rules
   #[getset(get = "pub")]
   number_of_ancestors_in_parent_scope: u8,
-  /// The number of lines to consider for cleaning up the comments 
+  /// The number of lines to consider for cleaning up the comments
   #[getset(get = "pub")]
   cleanup_comments_buffer: usize,
   /// The AST Kinds for which comments should be deleted
   #[getset(get = "pub")]
   cleanup_comments: bool,
-  
 }
 
 impl PiranhaArguments {
@@ -111,11 +107,11 @@ impl PiranhaArguments {
       args_builder.global_tag_prefix(v);
     }
 
-    if let Some(buffer_size) = piranha_args_from_config.cleanup_comments_buffer(){
+    if let Some(buffer_size) = piranha_args_from_config.cleanup_comments_buffer() {
       args_builder.cleanup_comments_buffer(buffer_size);
     }
 
-    if let Some(ast_kinds) = piranha_args_from_config.cleanup_comments(){
+    if let Some(ast_kinds) = piranha_args_from_config.cleanup_comments() {
       args_builder.cleanup_comments(ast_kinds);
     }
 

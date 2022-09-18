@@ -389,13 +389,12 @@ pub fn get_replace_range(input_edit: InputEdit) -> Range {
 }
 
 pub fn get_parser(language: String) -> Parser {
-    let mut parser = Parser::new();
-    parser
-      .set_language(language.get_language())
-      .expect("Could not set the language for the parser.");
-    parser
-  }
-  
+  let mut parser = Parser::new();
+  parser
+    .set_language(language.get_language())
+    .expect("Could not set the language for the parser.");
+  parser
+}
 
 pub trait MapOfVec<T, V> {
   fn collect(&mut self, key: T, value: V);
