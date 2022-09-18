@@ -17,6 +17,10 @@ use std::{
 };
 
 use colored::Colorize;
+#[cfg(test)]
+use dsl::scopes::{ScopeGenerator, ScopeQueryGenerator};
+#[cfg(test)]
+use tree_sitter_wrapper::get_parser;
 use dsl::constraint::Constraint;
 use log::info;
 use regex::Regex;
@@ -26,11 +30,11 @@ use tree_sitter_traversal::{traverse, Order};
 use crate::{edit::Edit, piranha_arguments::PiranhaArguments, rule_store::RuleStore};
 use dsl::rule::Rule;
 use piranha_utilities::eq_without_whitespace;
-use tree_sitter_wrapper::matches::Match;
 use tree_sitter_wrapper::{
   get_context, get_node_for_range, get_replace_range, get_tree_sitter_edit, substitute_tags,
   TreeSitterHelpers, TreeSitterQueryHelpers,
 };
+use tree_sitter_wrapper::{matches::Match};
 
 use getset::{CopyGetters, Getters};
 
