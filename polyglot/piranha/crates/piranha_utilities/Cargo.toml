@@ -1,0 +1,22 @@
+[package]
+authors = ["Ameya Ketkar <ketkara@uber.com>", "Lazaro Clapp <lazaro@uber.com>", "Murali Krishna Ramanathan", "Uber Technologies Inc."]
+name = "piranha_utilities"
+version = "0.1.2"
+edition = "2021"
+include = [
+    "src/"
+]
+license-file = "LICENSE"
+
+[lib]
+name = "piranha_utilities"
+path = "src/lib.rs"
+crate-type = ["cdylib", "rlib"]
+
+[build-dependencies]
+cc = "1.0.73"
+
+[dependencies]
+toml = "0.5.9"
+serde = { version= "1.0.136", default_features= false}
+serde_derive = { version= "1.0.136", default_features= false}
