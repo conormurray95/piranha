@@ -11,6 +11,13 @@ include = [
 license-file = "LICENSE"
 categories = ["structural find-replace", "find-replace", "structural seearch", "structural search and replace", "tree-sitter"]
 
+
+[workspace]
+members = [
+    "src/dsl",
+]
+
+
 [[bin]]
 name = "polyglot_piranha"
 path = "src/main.rs"
@@ -24,6 +31,7 @@ crate-type = ["cdylib", "rlib"]
 cc = "1.0.73"
 
 [dependencies]
+dsl = { path = "src/dsl" }
 tree-sitter = "0.20.6"
 tree-sitter-traversal = "0.1.2"
 json = "0.12.4"

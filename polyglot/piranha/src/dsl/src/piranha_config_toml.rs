@@ -10,17 +10,16 @@ Copyright (c) 2022 Uber Technologies, Inc.
  express or implied. See the License for the specific language governing permissions and
  limitations under the License.
 */
+use serde_derive::Deserialize;
 
-pub(crate) mod constraint;
-pub(crate) mod edit;
-pub(crate) mod matches;
-pub(crate) mod outgoing_edges;
-pub mod piranha_arguments;
-pub(crate) mod piranha_config;
-pub mod piranha_output;
-pub(crate) mod rule;
-pub(crate) mod rule_graph;
-pub(crate) mod rule_store;
-pub(crate) mod scopes;
-pub(crate) mod source_code_unit;
-mod piranha_rule;
+/// Captures the Piranha arguments by from the file at `path_to_feature_flag_rules`.
+#[derive(Deserialize, Debug, Clone, Hash, PartialEq, Eq, Default)]
+pub(crate) struct PiranhaConfiguration {
+  language: Vec<String>,
+  substitutions: Vec<Vec<String>>,
+  delete_file_if_empty: Option<bool>,
+  delete_consecutive_new_lines: Option<bool>,
+  global_tag_prefix: Option<String>,
+  cleanup_comments_buffer: Option<usize>,
+  cleanup_comments: Option<bool>,
+}

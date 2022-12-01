@@ -11,16 +11,12 @@ Copyright (c) 2022 Uber Technologies, Inc.
  limitations under the License.
 */
 
-pub(crate) mod constraint;
-pub(crate) mod edit;
-pub(crate) mod matches;
-pub(crate) mod outgoing_edges;
-pub mod piranha_arguments;
-pub(crate) mod piranha_config;
-pub mod piranha_output;
-pub(crate) mod rule;
-pub(crate) mod rule_graph;
-pub(crate) mod rule_store;
-pub(crate) mod scopes;
-pub(crate) mod source_code_unit;
-mod piranha_rule;
+use serde_derive::Deserialize;
+
+#[derive(Deserialize, Debug, Clone, Hash, PartialEq, Eq)]
+pub struct ConstraintToml {
+  /// Scope in which the constraint query has to be applied
+  matcher: String,
+  /// The Tree-sitter queries that need to be applied in the `matcher` scope
+  queries: Vec<String>,
+}
