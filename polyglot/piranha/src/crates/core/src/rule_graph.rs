@@ -11,10 +11,9 @@ Copyright (c) 2022 Uber Technologies, Inc.
  limitations under the License.
 */
 
-use crate::{
-  models::{outgoing_edges::OutgoingEdges, rule::Rule},
-  utilities::MapOfVec,
-};
+use dsl::{outgoing_edges::OutgoingEdges, rule::Rule};
+
+use tree_sitter_wrapper::MapOfVec;
 use std::collections::HashMap;
 
 #[derive(Debug)]

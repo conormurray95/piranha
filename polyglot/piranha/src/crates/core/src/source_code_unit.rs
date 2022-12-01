@@ -17,23 +17,28 @@ use std::{
 };
 
 use colored::Colorize;
-use itertools::Itertools;
 use log::{debug, error, trace};
 use regex::Regex;
 use tree_sitter::{InputEdit, Node, Parser, Range, Tree};
 use tree_sitter_traversal::{traverse, Order};
 
-use crate::{
-  models::rule_store::{GLOBAL, PARENT},
-  utilities::tree_sitter_utilities::{
-    get_context, get_node_for_range, get_replace_range, get_tree_sitter_edit, substitute_tags,
-    PiranhaHelpers, TreeSitterHelpers,
-  },
+use tree_sitter_wrapper::tree_sitter_utilities::{
+  get_context, get_node_for_range, get_replace_range, get_tree_sitter_edit, substitute_tags,
+  PiranhaHelpers, TreeSitterHelpers,
+};
+use crate::rule_store::{GLOBAL, PARENT};
+// use crate::{
+//   utilities::
+// };
+
+use dsl::{
+  rule::Rule,
+  scopes::ScopeGenerator,
 };
 
 use super::{
-  edit::Edit, matches::Match, piranha_arguments::PiranhaArguments, rule::Rule,
-  rule_store::RuleStore, scopes::ScopeGenerator,
+  edit::Edit, matches::Match, piranha_arguments::PiranhaArguments, 
+  rule_store::RuleStore, 
 };
 use getset::{CopyGetters, Getters, MutGetters};
 // Maintains the updated source code content and AST of the file

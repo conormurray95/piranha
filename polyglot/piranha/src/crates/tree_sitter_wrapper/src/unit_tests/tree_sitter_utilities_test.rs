@@ -22,7 +22,7 @@ use crate::models::{piranha_arguments::PiranhaArgumentsBuilder, source_code_unit
 use {
   super::{get_parser, substitute_tags, PiranhaHelpers, TreeSitterHelpers},
   crate::models::{
-    constraint::Constraint, rule::Rule, rule_store::RuleStore, source_code_unit::SourceCodeUnit,
+    constraint::Constraint, rule_store::RuleStore, source_code_unit::SourceCodeUnit,
   },
 };
 

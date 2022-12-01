@@ -14,8 +14,7 @@ Copyright (c) 2022 Uber Technologies, Inc.
 //! Defines the traits containing with utility functions that interface with tree-sitter.
 
 use crate::{
-  models::{matches::Match},
-  utilities::MapOfVec,
+  matches::Match, MapOfVec
 };
 use colored::Colorize;
 use itertools::Itertools;
@@ -27,7 +26,7 @@ use tree_sitter::{InputEdit, Language, Node, Point, Query, QueryCapture, QueryCu
 
 use super::eq_without_whitespace;
 
-pub(crate) trait TreeSitterHelpers {
+pub trait TreeSitterHelpers {
   /// Gets the tree-sitter language model.
   fn get_language(&self) -> Language;
   /// Compiles query string to `tree_sitter::Query`
@@ -70,7 +69,7 @@ impl TreeSitterHelpers for String {
 }
 
 #[rustfmt::skip]
-pub(crate) trait PiranhaHelpers {
+pub trait PiranhaHelpers {
 
      /// Applies the query upon `self`, and gets the first match
     /// # Arguments
@@ -248,7 +247,7 @@ fn get_range_for_replace_node(
 /// Replaces the given byte range (`replace_range`) with the `replacement`.
 /// Returns tree-sitter's edit representation along with updated source code.
 /// Note: This method does not update `self`.
-pub(crate) fn get_tree_sitter_edit(
+pub fn get_tree_sitter_edit(
   code: String, replace_range: Range, replacement: &str,
 ) -> (String, InputEdit) {
   // Log the edit
@@ -324,7 +323,7 @@ fn _get_tree_sitter_edit(
 ///     replacement pattern.
 ///
 /// Note that,  it escapes newline characters for tree-sitter-queries.
-pub(crate) fn substitute_tags(
+pub fn substitute_tags(
   input_string: String, substitutions: &HashMap<String, String>, is_tree_sitter_query: bool,
 ) -> String {
   let mut output = input_string;
@@ -342,7 +341,7 @@ pub(crate) fn substitute_tags(
 }
 
 /// Get the smallest node within `self` that spans the given range.
-pub(crate) fn get_node_for_range(root_node: Node, start_byte: usize, end_byte: usize) -> Node {
+pub fn get_node_for_range(root_node: Node, start_byte: usize, end_byte: usize) -> Node {
   root_node
     .descendant_for_byte_range(start_byte, end_byte)
     .unwrap()
@@ -363,7 +362,7 @@ fn get_non_str_eq_parent(node: Node, source_code: String) -> Option<Node> {
 }
 
 /// Returns the node, its parent, grand parent and great grand parent
-pub(crate) fn get_context<'a>(
+pub fn get_context<'a>(
   root_node: Node, prev_node: Node<'a>, source_code: String, count: u8,
 ) -> Vec<Node<'a>> {
   let mut output = Vec::new();
@@ -376,7 +375,7 @@ pub(crate) fn get_context<'a>(
   output
 }
 
-pub(crate) fn get_replace_range(input_edit: InputEdit) -> Range {
+pub fn get_replace_range(input_edit: InputEdit) -> Range {
   Range {
     start_byte: input_edit.start_byte,
     end_byte: input_edit.new_end_byte,
@@ -386,7 +385,7 @@ pub(crate) fn get_replace_range(input_edit: InputEdit) -> Range {
 }
 
 #[cfg(test)]
-pub(crate) fn get_parser(language: String) -> Parser {
+pub fn get_parser(language: String) -> Parser {
   let mut parser = Parser::new();
   parser
     .set_language(language.get_language())

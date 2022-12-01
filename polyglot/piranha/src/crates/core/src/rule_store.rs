@@ -17,15 +17,15 @@ use colored::Colorize;
 use log::{debug, info, trace};
 use tree_sitter::{Language, Query};
 
+use dsl::{
+  rule::Rule,
+  scopes::{ScopeGenerator, ScopeQueryGenerator},
+};
+use tree_sitter_wrapper::{tree_sitter_utilities::TreeSitterHelpers, MapOfVec};
 use crate::{
-  config::read_config_files,
-  models::piranha_arguments::PiranhaArguments,
-  models::{
-    rule::Rule,
-    rule_graph::RuleGraph,
-    scopes::{ScopeGenerator, ScopeQueryGenerator},
-  },
-  utilities::{tree_sitter_utilities::TreeSitterHelpers, MapOfVec},
+  rule_graph::RuleGraph,
+  piranha_arguments::read_config_files,
+  piranha_arguments::PiranhaArguments,
 };
 
 pub(crate) static GLOBAL: &str = "Global";

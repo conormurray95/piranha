@@ -14,15 +14,15 @@ Copyright (c) 2022 Uber Technologies, Inc.
 use clap::Parser;
 use colored::Colorize;
 use derive_builder::Builder;
+use dsl::{rule::{Rule, Rules}, outgoing_edges::{OutgoingEdges, Edges}};
 use getset::{CopyGetters, Getters};
 use log::info;
-use std::{collections::HashMap, path::PathBuf};
+use std::{collections::HashMap, path::{PathBuf, Path}};
 use tree_sitter::Language;
-
+use tree_sitter_wrapper::{read_toml, tree_sitter_utilities::TreeSitterHelpers};
 use crate::{
-  config::CommandLineArguments,
-  models::piranha_config::PiranhaConfiguration,
-  utilities::{read_toml, tree_sitter_utilities::TreeSitterHelpers},
+  piranha_config::{PiranhaConfiguration,CommandLineArguments}, scopes::ScopeGenerator,
+  
 };
 
 #[derive(Clone, Builder, Getters, CopyGetters, Debug)]
@@ -148,4 +148,27 @@ impl Default for PiranhaArguments {
       dry_run: false,
     }
   }
+}
+
+pub fn read_config_files(
+  args: &PiranhaArguments,
+) -> (Vec<Rule>, Vec<OutgoingEdges>, Vec<ScopeGenerator>) {
+  let path_to_config = Path::new(args.path_to_configurations());
+  // Read the language specific cleanup rules and edges
+  let language_rules: Rules = read_language_specific_rules(args.language_name());
+  let language_edges: Edges = read_language_specific_edges(args.language_name());
+  let scopes = read_scope_config(args.language_name());
+
+  // Read the API specific cleanup rules and edges
+  let mut input_rules: Rules = read_toml(&path_to_config.join("rules.toml"), true);
+  let input_edges: Edges = read_toml(&path_to_config.join("edges.toml"), true);
+
+  for r in input_rules.rules.iter_mut() {
+    r.add_to_seed_rules_group();
+  }
+
+  let all_rules = [language_rules.rules, input_rules.rules].concat();
+  let all_edges = [language_edges.edges, input_edges.edges].concat();
+
+  (all_rules, all_edges, scopes)
 }

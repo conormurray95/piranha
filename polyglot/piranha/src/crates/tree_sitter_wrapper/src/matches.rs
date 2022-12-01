@@ -18,7 +18,7 @@ use serde_derive::Serialize;
 
 #[derive(Serialize, Debug, Clone)]
 #[pyclass]
-pub(crate) struct Match {
+pub struct Match {
   // Range of the entire AST node captured by the match
   #[pyo3(get)]
   range: Range,
@@ -28,7 +28,7 @@ pub(crate) struct Match {
 }
 
 impl Match {
-  pub(crate) fn new(range: tree_sitter::Range, matches: HashMap<String, String>) -> Self {
+  pub fn new(range: tree_sitter::Range, matches: HashMap<String, String>) -> Self {
     Self {
       range: Range {
         start_byte: range.start_byte,
@@ -47,7 +47,7 @@ impl Match {
   }
 
   /// Get the edit's replacement range.
-  pub(crate) fn range(&self) -> tree_sitter::Range {
+  pub fn range(&self) -> tree_sitter::Range {
     tree_sitter::Range {
       start_byte: self.range.start_byte,
       end_byte: self.range.end_byte,
@@ -62,7 +62,7 @@ impl Match {
     }
   }
 
-  pub(crate) fn matches(&self) -> &HashMap<String, String> {
+  pub fn matches(&self) -> &HashMap<String, String> {
     &self.matches
   }
 }

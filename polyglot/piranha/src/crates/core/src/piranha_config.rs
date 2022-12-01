@@ -12,10 +12,10 @@ Copyright (c) 2022 Uber Technologies, Inc.
 */
 use serde_derive::Deserialize;
 use std::collections::HashMap;
-
+use clap::Parser;
 /// Captures the Piranha arguments by from the file at `path_to_feature_flag_rules`.
 #[derive(Deserialize, Debug, Clone, Hash, PartialEq, Eq, Default)]
-pub(crate) struct PiranhaConfiguration {
+pub struct PiranhaConfiguration {
   language: Vec<String>,
   substitutions: Vec<Vec<String>>,
   delete_file_if_empty: Option<bool>,
@@ -26,7 +26,7 @@ pub(crate) struct PiranhaConfiguration {
 }
 
 impl PiranhaConfiguration {
-  pub(crate) fn substitutions(&self) -> HashMap<String, String> {
+  pub fn substitutions(&self) -> HashMap<String, String> {
     self
       .substitutions
       .iter()
@@ -34,27 +34,46 @@ impl PiranhaConfiguration {
       .collect()
   }
 
-  pub(crate) fn language(&self) -> String {
+  pub fn language(&self) -> String {
     self.language[0].clone()
   }
 
-  pub(crate) fn delete_file_if_empty(&self) -> Option<bool> {
+  pub fn delete_file_if_empty(&self) -> Option<bool> {
     self.delete_file_if_empty
   }
 
-  pub(crate) fn delete_consecutive_new_lines(&self) -> Option<bool> {
+  pub fn delete_consecutive_new_lines(&self) -> Option<bool> {
     self.delete_consecutive_new_lines
   }
 
-  pub(crate) fn global_tag_prefix(&self) -> Option<String> {
+  pub fn global_tag_prefix(&self) -> Option<String> {
     self.global_tag_prefix.clone()
   }
 
-  pub(crate) fn cleanup_comments_buffer(&self) -> Option<usize> {
+  pub fn cleanup_comments_buffer(&self) -> Option<usize> {
     self.cleanup_comments_buffer
   }
 
-  pub(crate) fn cleanup_comments(&self) -> Option<bool> {
+  pub fn cleanup_comments(&self) -> Option<bool> {
     self.cleanup_comments
   }
+}
+
+
+/// A refactoring tool that eliminates dead code related to stale feature flags.
+#[derive(Clone, Parser, Debug)]
+#[clap(name = "Piranha")]
+pub struct CommandLineArguments {
+  /// Path to source code folder
+  #[clap(short = 'c', long)]
+  pub path_to_codebase: String,
+  /// Directory containing the configuration files - `piranha_arguments.toml`, `rules.toml`,  and  `edges.toml` (optional)
+  #[clap(short = 'f', long)]
+  pub path_to_configurations: String,
+  /// Path to output summary json
+  #[clap(short = 'j', long)]
+  pub path_to_output_summary: Option<String>,
+  /// Disables in-place rewriting of code
+  #[clap(short = 'd', long, parse(try_from_str), default_value_t = false)]
+  pub dry_run: bool,
 }

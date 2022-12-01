@@ -15,8 +15,8 @@ use std::path::PathBuf;
 
 use itertools::Itertools;
 use serde_derive::Serialize;
-
-use super::{edit::Edit, matches::Match, source_code_unit::SourceCodeUnit};
+use source_code_unit::SourceCodeUnit;
+use tree_sitter_wrapper::{edit::Edit, matches::Match};
 use pyo3::prelude::pyclass;
 #[derive(Serialize, Debug, Clone, Default)]
 #[pyclass]
