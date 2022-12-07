@@ -61,6 +61,7 @@ fn _run_match_test(path_to_codebase: String, path_to_configurations: String, num
     path_to_codebase,
     path_to_configurations,
     dry_run: true,
+    ignore_parse_error: false,
       };
     let args = PiranhaArguments::from(piranha_input);
     print!("{:?}", args);

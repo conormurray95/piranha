@@ -63,3 +63,45 @@ func after_return4() string {
 
 	return "not enabled"
 }
+
+func empty_if(something bool) {
+}
+
+// not removing empty if as we don't want to artificially negate `condition`s
+// it can be a complex condition with multiple `||` and/or `&&`
+func empty_if_with_else(something bool) {
+	if something {
+	} else {
+		fmt.Println("non empty else")
+	}
+}
+
+func only_else_if(something bool) {
+	if something {
+		fmt.Println("only something")
+	}
+}
+
+func empty_else_if(something bool, other bool) {
+	if !something {
+		fmt.Println("not something")
+		fmt.Println("not something 2")
+		fmt.Println("not something 3")
+	}
+}
+
+func empty_else_if_but_else(something bool, other bool) {
+	if !something {
+		fmt.Println("not something")
+		fmt.Println("not something 2")
+		fmt.Println("not something 3")
+	} else {
+		fmt.Println("just else")
+	}
+}
+
+func empty_else(something bool) {
+	if something {
+		fmt.Println("something")
+	}
+}

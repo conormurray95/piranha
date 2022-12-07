@@ -484,3 +484,124 @@ queries = [
 )
 """
 ]
+
+#####
+# empty_if_else_cleanup
+
+# Explicit check to *MATCH* an `else if`
+# Will remove an empty `else if {}`
+[[rules]]
+groups = ["empty_if_else_cleanup"]
+name = "remove_empty_else_if"
+query = """
+(
+    (if_statement
+            condition: (_) @condition
+            consequence: (_) @consequence
+            "else" @else
+            alternative:
+            (if_statement
+                consequence: (block) @block
+                alternative: (_)? @alternative
+            )
+    ) @if_statement
+    (#eq? @alternative "")
+    (#match? @block "^\\\\{\\\\s+\\\\}$")
+)
+"""
+# Exactly matching the `else if {}` is very tricky
+# Therefore we are reconstructing the if statement
+replace = "if @condition @consequence"
+replace_node = "if_statement"
+
+
+#
+# if a {
+#     fmt.Println("a")
+# } else if { } // empty
+# else {
+#     fmt.Println("not empty")
+# }
+#
+[[rules]]
+groups = ["empty_if_else_cleanup"]
+name = "remove_empty_else_if_with_else"
+query = """
+(
+    (if_statement
+            condition: (_) @condition
+            consequence: (_) @consequence
+            "else" @else
+            alternative:
+            (if_statement
+                consequence: (block) @block
+                alternative: (_) @alternative
+            )
+    ) @if_statement
+    (#not-eq? @alternative "")
+    (#match? @block "^\\\\{\\\\s+\\\\}$")
+)
+"""
+# Exactly matching the `else if {}` is very tricky
+# Therefore we are reconstructing the if statement
+replace = "if @condition @consequence else @alternative"
+replace_node = "if_statement"
+
+[[rules]]
+groups = ["empty_if_else_cleanup"]
+name = "remove_empty_else"
+query = """
+(
+    (if_statement
+        ((
+            "else" @else
+            alternative: (block) @else_block
+        ) @bundled_e_lse)
+    ) @if_statement
+    (#match? @else_block "^\\\\{\\\\s+\\\\}$")
+)
+"""
+# trick to push the empty block to a new line
+# it will be a parse error if it's in the same line
+replace = "\n"
+replace_node = "bundled_e_lse"
+
+# This rule needs to be the last one defined it seems
+# Will match and remove an `if {}` (empty block) that is not preceeded by `else`
+[[rules]]
+groups = ["empty_if_else_cleanup"]
+name = "remove_empty_if_without_else"
+query = """
+(
+    (
+        "else"? @else
+        (if_statement
+            condition: (_) @condition
+            consequence: (block) @block
+            alternative: (_)? @alternative
+        ) @if_statement
+        (#eq? @else "")
+        (#eq? @alternative "")
+        (#match? @block "^\\\\{\\\\s+\\\\}$")
+    )
+)
+"""
+replace = ""
+replace_node = "if_statement"
+
+[[rules]]
+name = "remove_empty_nested_block"
+query = """
+(
+    (block
+        (statement_list
+            (_)* @pre
+            (block) @nested.block
+            (_)* @post
+        ) @outer.stmt_list
+    ) @outer.block
+    (#match? @nested.block "^\\\\{\\\\s*\\\\}$")
+)
+"""
+replace = ""
+replace_node = "nested.block"

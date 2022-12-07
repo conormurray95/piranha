@@ -61,7 +61,15 @@ to = ["boolean_literal_cleanup"]
 [[edges]]
 scope = "Parent"
 from = "if_cleanup"
-to = ["remove_unnecessary_nested_block"]
+to = [
+    "remove_unnecessary_nested_block",
+    "empty_if_else_cleanup",
+]
+
+[[edges]]
+scope = "Parent"
+from = "empty_if_else_cleanup"
+to = ["remove_empty_nested_block"]
 
 [[edges]]
 scope = "Parent"
