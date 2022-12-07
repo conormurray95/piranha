@@ -362,6 +362,19 @@ name = "simplify_something_and_false_consequence_block"
 query = """
 (
     (if_statement
+        initializer: (
+            (assignment_statement
+                left: (expression_list
+                    (identifier) @variable_name
+                )
+                right: (expression_list
+                    ([
+                        (true)
+                        (false)
+                    ]) @value
+                )
+            )
+        )? @initializer
         condition: (binary_expression
             left: (_) @l_hs
             operator: "&&"
@@ -384,6 +397,19 @@ name = "simplify_something_or_true_alternative"
 query = """
 (
     (if_statement
+        initializer: (
+            (assignment_statement
+                left: (expression_list
+                    (identifier) @variable_name
+                )
+                right: (expression_list
+                    ([
+                        (true)
+                        (false)
+                    ]) @value
+                )
+            )
+        )? @initializer
         condition: (binary_expression
             left: (_) @l_hs
             operator: "||"
