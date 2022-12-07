@@ -85,6 +85,7 @@ fn run_rewrite_test(relative_path_to_tests: &str, n_files_changed: usize) {
     path_to_codebase,
     path_to_configurations,
     dry_run: true,
+    ignore_parse_error: false,
   };
   let args = PiranhaArguments::from(piranha_input);
   print!("{:?}", args);

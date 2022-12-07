@@ -16,7 +16,7 @@ use clap::Parser;
 use super::{
   default_configs::{
     default_cleanup_comments, default_cleanup_comments_buffer,
-    default_delete_consecutive_new_lines, default_delete_file_if_empty, default_dry_run,
+    default_delete_consecutive_new_lines, default_delete_file_if_empty, default_dry_run, default_ignore_parse_error,
     default_global_tag_prefix, default_input_substitutions, default_languages,
     default_number_of_ancestors_in_parent_scope, default_path_to_codebase,
     default_path_to_configurations, default_path_to_output_summaries, default_piranha_language,
@@ -127,6 +127,12 @@ pub struct PiranhaArguments {
   #[clap(short = 'd', long, parse(try_from_str), default_value_t = false)]
   #[serde(default = "default_dry_run")]
   dry_run: bool,
+  /// Won't panic if a rewrite raises a tree-sitter parse error
+  #[get = "pub"]
+  #[builder(default = "default_ignore_parse_error()")]
+  #[clap(short = 'd', long, parse(try_from_str), default_value_t = false)]
+  #[serde(default = "default_ignore_parse_error")]
+  ignore_parse_error: bool,
 }
 
 impl PiranhaArguments {
@@ -227,6 +233,7 @@ impl PiranhaArguments {
         default_cleanup_comments(),
       ),
       dry_run: Self::_merge(self.dry_run, other.dry_run, default_dry_run()),
+      ignore_parse_error: Self::_merge(self.ignore_parse_error, other.ignore_parse_error, default_ignore_parse_error()),
     }
   }
 }

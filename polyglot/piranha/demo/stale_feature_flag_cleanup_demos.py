@@ -1,7 +1,7 @@
 from os.path import join, dirname, getmtime, exists
 from polyglot_piranha import run_piranha_cli
-import logging 
-from logging import info 
+import logging
+from logging import info
 
 feature_flag_dir = join(dirname(__file__), 'feature_flag_cleanup')
 
@@ -15,7 +15,7 @@ def run_java_ff_demo():
 
     old_mtime = getmtime(modified_file_path)
 
-    output_summary_java = run_piranha_cli(directory_path, configuration_path, False)
+    output_summary_java = run_piranha_cli(directory_path, configuration_path, False, False)
 
     assert len(output_summary_java) == 2
 
@@ -37,8 +37,8 @@ def run_kt_ff_demo():
 
     old_mtime = getmtime(modified_file_path)
 
-    output_summary_kt = run_piranha_cli(directory_path, configuration_path, False)
-    
+    output_summary_kt = run_piranha_cli(directory_path, configuration_path, False, False)
+
     assert len(output_summary_kt) == 2
 
     for summary in output_summary_kt:

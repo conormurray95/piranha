@@ -13,6 +13,7 @@ pub enum PiranhaInput {
     path_to_codebase: String,
     path_to_configurations: String,
     dry_run: bool,
+    ignore_parse_error: bool,
   },
 }
 
@@ -24,11 +25,13 @@ impl From<PiranhaInput> for PiranhaArguments {
         path_to_codebase,
         path_to_configurations,
         dry_run,
+        ignore_parse_error,
       } => PiranhaArgumentsBuilder::default()
         .path_to_codebase(path_to_codebase)
         .path_to_configurations(path_to_configurations)
         .path_to_output_summary(None)
         .dry_run(dry_run)
+        .ignore_parse_error(ignore_parse_error)
         .build()
         .unwrap(),
     };
