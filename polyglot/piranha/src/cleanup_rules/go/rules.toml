@@ -356,6 +356,47 @@ replace = "@alternative"
 replace_node = "if_statement"
 groups = ["if_cleanup"]
 
+[[rules]]
+groups = ["if_cleanup"]
+name = "simplify_something_and_false_consequence_block"
+query = """
+(
+    (if_statement
+        condition: (binary_expression
+            left: (_) @l_hs
+            operator: "&&"
+            right: (false) @r_hs
+        ) @condition
+        consequence: (block
+            (statement_list) @_stmt_list
+        ) @block
+        alternative: (_)? @alternative
+    ) @if_statement
+    (#not-eq? @block "")
+)
+"""
+replace = ""
+replace_node = "_stmt_list"
+
+[[rules]]
+groups = ["if_cleanup"]
+name = "simplify_something_or_true_alternative"
+query = """
+(
+    (if_statement
+        condition: (binary_expression
+            left: (_) @l_hs
+            operator: "||"
+            right: (true) @r_hs
+        ) @condition
+        consequence: (_) @consequence
+        alternative: (_) @alternative
+    ) @if_statement
+)
+"""
+replace = "if @condition @consequence"
+replace_node = "if_statement"
+
 # Before :
 #  {
 #     someStepsBefore();
@@ -511,9 +552,6 @@ queries = [
 """
 ]
 
-#####
-# empty_if_else_cleanup
-
 # Explicit check to *MATCH* an `else if`
 # Will remove an empty `else if {}`
 [[rules]]
@@ -540,6 +578,21 @@ query = """
 replace = "if @condition @consequence"
 replace_node = "if_statement"
 
+# these constraints is to keep the intended behavior
+# we could introduce a comment into the removed block of `something_and_false` and `something_or_true` to avoid these verbose constraints among all `empty_if_else_cleanup` rules
+[[rules.constraints]]
+matcher = "(if_statement) @i_f_stmt"
+queries = [
+"""
+(if_statement
+    condition: (binary_expression
+        left: (_) @l_hs
+        operator: "&&"
+        right: (false) @r_hs
+    ) @i_f_condition
+)
+"""
+]
 
 #
 # if a {
@@ -573,6 +626,20 @@ query = """
 replace = "if @condition @consequence else @alternative"
 replace_node = "if_statement"
 
+[[rules.constraints]]
+matcher = "(if_statement) @i_f_stmt"
+queries = [
+"""
+(if_statement
+    condition: (binary_expression
+        left: (_) @l_hs
+        operator: "&&"
+        right: (false) @r_hs
+    ) @i_f_condition
+)
+"""
+]
+
 [[rules]]
 groups = ["empty_if_else_cleanup"]
 name = "remove_empty_else"
@@ -591,6 +658,20 @@ query = """
 # it will be a parse error if it's in the same line
 replace = "\n"
 replace_node = "bundled_e_lse"
+
+[[rules.constraints]]
+matcher = "(if_statement) @i_f_stmt"
+queries = [
+"""
+(if_statement
+    condition: (binary_expression
+        left: (_) @l_hs
+        operator: "&&"
+        right: (false) @r_hs
+    ) @i_f_condition
+)
+"""
+]
 
 # This rule needs to be the last one defined it seems
 # Will match and remove an `if {}` (empty block) that is not preceeded by `else`
@@ -614,6 +695,20 @@ query = """
 """
 replace = ""
 replace_node = "if_statement"
+
+[[rules.constraints]]
+matcher = "(if_statement) @i_f_stmt"
+queries = [
+"""
+(if_statement
+    condition: (binary_expression
+        left: (_) @l_hs
+        operator: "&&"
+        right: (false) @r_hs
+    ) @i_f_condition
+)
+"""
+]
 
 [[rules]]
 name = "remove_empty_nested_block"

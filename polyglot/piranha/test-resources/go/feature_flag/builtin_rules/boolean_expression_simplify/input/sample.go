@@ -92,8 +92,10 @@ func simplify_false_and_something(something bool) {
 		fmt.Println("else 5")
 	}
 	// does not simplify binary_expression; left call may contain side-effects
+	// remove the consequence block
 	if exp.BoolValue("random") && exp.BoolValue("false") {
-		fmt.Println("keep 1")
+		fmt.Println("remove 1")
+		fmt.Println("remove 2")
 	} else {
 		fmt.Println("keep 2")
 	}
@@ -124,6 +126,37 @@ func simplify_true_or_something(something bool) {
 	// does not simplify binary_expression; left call may contain side-effects
 	if exp.BoolValue("random") || exp.BoolValue("true") {
 		fmt.Println("keep")
+	}
+}
+
+func side_effects_simplification() {
+	if exp.BoolValue("random") && exp.BoolValue("false") {
+		fmt.Println("remove 1a")
+		fmt.Println("remove 1a")
+	} else if exp.BoolValue("another") {
+		fmt.Println("keep 1a")
+	} else {
+		fmt.Println("keep 1b")
+	}
+
+	if exp.BoolValue("random") && exp.BoolValue("false") {
+		fmt.Println("remove 2")
+	}
+
+	if exp.BoolValue("random") || exp.BoolValue("true") {
+		fmt.Println("keep 3a")
+		fmt.Println("keep 3b")
+	} else if exp.BoolValue("another") {
+		fmt.Println("remove 3a")
+	} else {
+		fmt.Println("remove 3b")
+		fmt.Println("remove 3c")
+	}
+
+	if exp.BoolValue("random") || exp.BoolValue("true") {
+		fmt.Println("keep 4")
+	} else {
+		fmt.Println("remove 4")
 	}
 }
 
