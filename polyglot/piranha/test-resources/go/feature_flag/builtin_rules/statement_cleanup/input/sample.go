@@ -170,3 +170,19 @@ func empty_else(something bool) {
 		}
 	}
 }
+
+func named_return_if_false() (can bool) {
+	if can = exp.BoolValue("false"); false {
+		fmt.Println("should be removed")
+	}
+
+	return can
+}
+
+func named_return_if_true() (can bool) {
+	if can = exp.BoolValue("true"); true {
+		fmt.Println("true")
+	}
+
+	return can
+}

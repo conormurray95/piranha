@@ -287,6 +287,19 @@ name = "simplify_if_statement_true"
 query = """
 (
     (if_statement
+        initializer: (
+          (assignment_statement
+            left: (expression_list
+                (identifier) @variable_name
+            )
+            right: (expression_list
+                ([
+                    (true)
+                    (false)
+                ]) @value
+            )
+          )
+        )? @initializer
         condition : (
             [
                 (true)
@@ -315,6 +328,19 @@ name = "simplify_if_statement_false"
 query = """
 (
     (if_statement
+        initializer: (
+          (assignment_statement
+            left: (expression_list
+                (identifier) @variable_name
+            )
+            right: (expression_list
+                ([
+                    (true)
+                    (false)
+                ]) @value
+            )
+          )
+        )? @initializer
         condition : (
             [
                 (false)

@@ -105,3 +105,12 @@ func empty_else(something bool) {
 		fmt.Println("something")
 	}
 }
+
+func named_return_if_false() (can bool) {
+	return false
+}
+
+func named_return_if_true() (can bool) {
+	fmt.Println("true")
+	return true
+}
