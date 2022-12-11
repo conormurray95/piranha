@@ -43,7 +43,7 @@ fn test_go_builtin_statement_cleanup() {
   initialize();
   run_rewrite_test(
     &format!("{}/{}/{}/{}", LANGUAGE, "feature_flag", "builtin_rules", "statement_cleanup"),
-    1,
+    2,
   );
 }
 

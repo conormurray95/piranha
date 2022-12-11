@@ -272,6 +272,34 @@ groups = ["boolean_expression_simplify"]
 [[rules]]
 name = "statement_cleanup"
 
+# ugly Workaround to deal with `else if false {}`
+# It seems impossible for us to match `else if ...` and replace both the else and if_statement together
+# `simplify_if_statement_false` was leaving a a dangling `else` which turns the code not compilable
+[[rules]]
+name = "remove_else_from_else_if_false"
+query = """
+(
+    (if_statement
+        condition: (_) @condition
+        consequence: (_) @consequence
+        "else" @else
+        alternative:
+        (if_statement
+            condition:  (
+                [
+                    (false)
+                    (parenthesized_expression (false))
+                ]
+            ) @inner_c_ondition
+            consequence: (block) @block
+            alternative: (_)? @alternative
+        )
+    ) @if_statement
+)
+"""
+replace = "\n"
+replace_node = "else"
+
 # Before :
 #  if (true) { doSomething(); }
 # After :

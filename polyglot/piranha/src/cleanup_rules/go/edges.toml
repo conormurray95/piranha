@@ -35,12 +35,20 @@ scope = "Parent"
 from = "boolean_expression_simplify"
 to = ["boolean_literal_cleanup"]
 
+### statement_cleanup
 [[edges]]
 scope = "Parent"
 from = "statement_cleanup"
+to = [
+    "remove_else_from_else_if_false",
+    "if_cleanup",
+]
+
+[[edges]]
+scope = "Function-Method"
+from = "remove_else_from_else_if_false"
 to = ["if_cleanup"]
 
-### statement_cleanup
 [[edges]]
 scope = "Function-Method"
 from = "statement_cleanup"
