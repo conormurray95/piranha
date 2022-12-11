@@ -376,7 +376,7 @@ query = """
             ]
         )
         consequence : (_)
-        alternative: ((_) @alternative) ?
+        alternative: (_)? @alternative
     ) @if_statement
 )
 """
