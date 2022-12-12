@@ -24,6 +24,15 @@ func else_if_cleanup(something bool, somethingElse bool) bool {
 // 	} else {
 // 		fmt.Println("keep 2c")
 // 	}
-
 // 	return true
 // }
+
+func delete_var_decl_double_short_var_decl(something bool) bool {
+	if something {
+		disabled := false
+		return disabled
+	} else {
+		disabled := somethingElse()
+		return disabled
+	}
+}
