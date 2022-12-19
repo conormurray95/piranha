@@ -385,7 +385,6 @@ replace_node = "if_statement"
 groups = ["if_cleanup"]
 
 [[rules]]
-groups = ["if_cleanup"]
 name = "simplify_something_and_false_consequence_block"
 query = """
 (
@@ -418,9 +417,9 @@ query = """
 """
 replace = ""
 replace_node = "_stmt_list"
+groups = ["if_cleanup"]
 
 [[rules]]
-groups = ["if_cleanup"]
 name = "simplify_something_or_true_alternative"
 query = """
 (
@@ -450,6 +449,7 @@ query = """
 """
 replace = "if @condition @consequence"
 replace_node = "if_statement"
+groups = ["if_cleanup"]
 
 # Before :
 #  {
@@ -632,7 +632,6 @@ queries = [
 # Explicit check to *MATCH* an `else if`
 # Will remove an empty `else if {}`
 [[rules]]
-groups = ["empty_if_else_cleanup"]
 name = "remove_empty_else_if"
 query = """
 (
@@ -654,6 +653,7 @@ query = """
 # Therefore we are reconstructing the if statement
 replace = "if @condition @consequence"
 replace_node = "if_statement"
+groups = ["empty_if_else_cleanup"]
 
 # these constraints is to keep the intended behavior
 # we could introduce a comment into the removed block of `something_and_false` and `something_or_true` to avoid these verbose constraints among all `empty_if_else_cleanup` rules
@@ -680,7 +680,6 @@ queries = [
 # }
 #
 [[rules]]
-groups = ["empty_if_else_cleanup"]
 name = "remove_empty_else_if_with_else"
 query = """
 (
@@ -702,6 +701,7 @@ query = """
 # Therefore we are reconstructing the if statement
 replace = "if @condition @consequence else @alternative"
 replace_node = "if_statement"
+groups = ["empty_if_else_cleanup"]
 
 [[rules.constraints]]
 matcher = "(if_statement) @i_f_stmt"
@@ -718,7 +718,6 @@ queries = [
 ]
 
 [[rules]]
-groups = ["empty_if_else_cleanup"]
 name = "remove_empty_else"
 query = """
 (
@@ -735,6 +734,7 @@ query = """
 # it will be a parse error if it's in the same line
 replace = "\n"
 replace_node = "bundled_e_lse"
+groups = ["empty_if_else_cleanup"]
 
 [[rules.constraints]]
 matcher = "(if_statement) @i_f_stmt"
@@ -753,7 +753,6 @@ queries = [
 # This rule needs to be the last one defined it seems
 # Will match and remove an `if {}` (empty block) that is not preceeded by `else`
 [[rules]]
-groups = ["empty_if_else_cleanup"]
 name = "remove_empty_if_without_else"
 query = """
 (
@@ -772,6 +771,7 @@ query = """
 """
 replace = ""
 replace_node = "if_statement"
+groups = ["empty_if_else_cleanup"]
 
 [[rules.constraints]]
 matcher = "(if_statement) @i_f_stmt"
