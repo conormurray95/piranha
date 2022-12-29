@@ -27,3 +27,18 @@ query = """
     (for_statement) @for_stmt
 )
 """
+
+
+[[rules]]
+name = "capture_return_with_reference"
+query = """(
+(return_statement (expression_list (unary_expression (identifier)@var) @unary_expr))
+(#match? @unary_expr "&")
+)
+"""
+[[rules.constraints]]
+matcher = "(method_declaration) @fd"
+queries_include = ["""(
+(short_var_declaration (expression_list (identifier)@name))@decl
+(#eq? @name "@var")
+)"""]

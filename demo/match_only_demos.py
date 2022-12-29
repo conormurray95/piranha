@@ -25,7 +25,9 @@ def go_demo():
 
     assert rule_match_counter['find_go_stmt_for_loop'] == 1
 
-    assert rule_match_counter['find_for'] == 4
+    assert rule_match_counter['find_for'] == 5
+
+    assert rule_match_counter['capture_return_with_reference'] == 1
 
 def ts_demo():
     info("Running the Match-only demo for TypeScript")
@@ -52,9 +54,9 @@ FORMAT = '%(levelname)s %(name)s %(asctime)-15s %(filename)s:%(lineno)d %(messag
 logging.basicConfig(format=FORMAT)
 logging.getLogger().setLevel(logging.INFO)
 
-java_demo()
+# java_demo()
 go_demo()
-ts_demo()
-tsx_demo()
+# ts_demo()
+# tsx_demo()
 
 info("Completed running the Match-only demo")

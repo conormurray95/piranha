@@ -48,3 +48,16 @@ func f3() {
         fmt.Printf("2**%d = %d\n", i, v)
     }
 }
+
+
+func (r Ruleset) Match(path string) (*Rule, error) {
+  for i := len(r) - 1; i >= 0; i-- {
+    rule1 := r[i]
+    match, err := rule.Match(path)
+    if match || err != nil {
+      return &rule, err
+    }
+  }
+  return nil, nil
+}
+
