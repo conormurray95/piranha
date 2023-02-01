@@ -36,4 +36,11 @@ class SampleClass {
         isEnabled = v1
         isEnabled = v1
     }
+
+    func checkAndFalse() {
+        isEnabled = false
+        isEnabled = false
+        isEnabled = f2() && false
+        isEnabled = false
+    }
 }
