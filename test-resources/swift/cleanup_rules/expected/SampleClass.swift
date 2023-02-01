@@ -15,4 +15,6 @@ class SampleClass {
     var isEnabled3 = v1
     var isEnabled4 = f2()
     var isEnabled5 = v2
+
+    var isEnabled6 = false
 }
