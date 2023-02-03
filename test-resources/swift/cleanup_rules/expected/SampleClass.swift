@@ -36,4 +36,9 @@ class SampleClass {
         isEnabled = v1
         isEnabled = v1
     }
+
+     func checkNotCondition() {
+        isEnabled = v2
+        isEnabled = v2
+    }
 }
